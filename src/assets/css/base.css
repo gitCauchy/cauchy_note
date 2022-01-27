@@ -1,0 +1,34 @@
+@import "normalize.css";
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.form_username .el-form-item__label {
+  font-size: 16px;
+  color: white;
+}
+
+.form_password .el-form-item__label {
+  font-size: 16px;
+  color: white;
+}
+
+.form_email .el-form-item__label {
+  color: white;
+  font-size: 16px;
+}
+
+.el-card {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !important;
+}
+
+.el-table{
+  font-size: 13px;
+}
+
+.el-pagination{
+  margin-top: 15px;
+}
