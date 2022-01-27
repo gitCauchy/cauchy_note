@@ -8,8 +8,8 @@
     text-color="#fff"
     active-text-color="#ffd04b"
   >
-    <h3 v-show="!isCollapse" style="color:#fff;text-align:center;">Adversarial Attack</h3>
-    <h3 v-show="isCollapse" style="color:#fff;text-align:center;">后台</h3>
+    <h3 v-show="!isCollapse" style="color:#fff;text-align:center;">Cauchy Note</h3>
+    <h3 v-show="isCollapse" style="color:#fff;text-align:center;">主页</h3>
 
     <el-menu-item :index="item.path" v-for="item in noChildren" :key="item.path" @click="clickMenu(item)">
       <i :class="item.icon"></i>

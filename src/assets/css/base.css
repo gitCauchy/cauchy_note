@@ -8,16 +8,16 @@ html, body, #app {
 
 .form_username .el-form-item__label {
   font-size: 16px;
-  color: white;
+  color: cornflowerblue;
 }
 
 .form_password .el-form-item__label {
   font-size: 16px;
-  color: white;
+  color: cornflowerblue;
 }
 
 .form_email .el-form-item__label {
-  color: white;
+  color: cornflowerblue;
   font-size: 16px;
 }
 
