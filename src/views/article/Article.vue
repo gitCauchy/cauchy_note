@@ -27,7 +27,7 @@
           <template slot-scope="scope">{{ scope.row.modifyTime.substr(0, 10) }}</template>
         </el-table-column>
         <el-table-column label="内容" align="center">
-          <template slot-scope="scope">{{ scope.row.content.substr(0, 10) + "......" }}</template>
+          <template slot-scope="scope">{{ handleDisplay(scope.row.content) }}</template>
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -81,12 +81,14 @@ const defaultQueryInfo = {
   searchWord: ""
 };
 
-const defaultUser = {
+const defaultArticle = {
   id: null,
   title: null,
   content: null,
   createTime: null,
+  authorId: sessionStorage.getItem("user_id"),
   modifyTime: null,
+  status: 0
 }
 
 export default {
@@ -99,13 +101,20 @@ export default {
       listLoading: false,
       dialogVisible: false,
       isEdit: false,
-      article: Object.assign({}, defaultUser),
+      article: Object.assign({}, defaultArticle),
     }
   },
   created() {
     this.getList();
   },
   methods: {
+    handleDisplay(content) {
+      if (content.length <= 10) {
+        return content;
+      } else {
+        return content.substr(0, 10) + "......"
+      }
+    },
     handleSizeChange(value) {
       this.queryInfo.pageNum = 1;
       this.queryInfo.pageSize = value;
@@ -121,6 +130,7 @@ export default {
         url: '/article/getArticleList',
         method: 'get',
         params: {
+          "authorId": sessionStorage.getItem("user_id"),
           "pageSize": this.queryInfo.pageSize,
           "pageNum": this.queryInfo.pageNum,
           "keyword": this.queryInfo.searchWord
@@ -163,7 +173,7 @@ export default {
     handleDialogConfirm() {
       if (this.isEdit) {
         request({
-          url: '/article/updateArticle',
+          url: '/article/modifyArticle',
           method: 'post',
           data: this.article
         }, (response) => {
@@ -173,6 +183,8 @@ export default {
           });
           this.dialogVisible = false;
           this.getList();
+        }, failure => {
+          console.log(failure);
         })
       } else { // 如果是新增窗口
         request({
@@ -194,7 +206,7 @@ export default {
     handleAdd() {
       this.dialogVisible = true;
       this.isEdit = false;
-      this.article = Object.assign({}, defaultUser)
+      this.article = Object.assign({}, defaultArticle)
     },
 
     handleSearchList() {

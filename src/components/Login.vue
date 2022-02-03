@@ -56,6 +56,7 @@ export default {
           if (response.data.SystemStatusCode === 100000) { // 登录验证通过
             // 1. 将登录成功后的 token 保存到客户端的 sessionStorage 中
             sessionStorage.setItem("username", this.user.username)
+            sessionStorage.setItem("user_id", response.data.userInfo.id)
             sessionStorage.setItem("userRole", response.data.userInfo.authorities[0].authority)
             sessionStorage.setItem("token", response.data.token)
             this.$store.commit("setMenuList", response.data.userInfo.menus)
