@@ -1,4 +1,4 @@
-# adversarial_attack
+# cauchy_note
 
 ## Project setup
 ```

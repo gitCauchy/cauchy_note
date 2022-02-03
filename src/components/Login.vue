@@ -24,7 +24,7 @@
 
 <script>
 import {request} from "../network/request";
-import {userRule, roleRule, permissionRule, menuRule, ruleMapping} from "../router/dynamic-routers";
+import {ruleMapping} from "../router/dynamic-routers";
 
 export default {
 

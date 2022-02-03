@@ -21,11 +21,18 @@ const menuRule = {
   component: () => import('../views/menu/Menu')
 }
 
+const articleRule = {
+  path: '/article',
+  name: 'article',
+  component: () => import('../views/article/Article')
+}
+
 const ruleMapping = {
   'user': userRule,
   'role': roleRule,
   'permission': permissionRule,
-  'menu': menuRule
+  'menu': menuRule,
+  'article': articleRule,
 }
 
-export {userRule, roleRule, permissionRule, menuRule, ruleMapping}
+export {userRule, roleRule, permissionRule, menuRule, articleRule, ruleMapping}

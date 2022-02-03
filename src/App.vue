@@ -1,27 +1,31 @@
 <template>
-  <div class= "test" id="#app">
+  <div class="test" id="#app">
     <router-view></router-view>
-<!--    <login></login>-->
-<!--    <Register></Register>-->
   </div>
 </template>
 
 <script>
-import Login from "./components/Login";
-import Register from "./components/Register";
+
+import {ruleMapping} from "./router/dynamic-routers";
 
 export default {
   name: 'App',
-  components: {
-    Login,
-    Register
+  components: {},
+  created() {
+    const currentRoutes = this.$router.options.routes
+    const menuList = this.$store.state.userMenuList;
+    menuList.forEach(item => {
+      const tmp = ruleMapping[item.name]
+      currentRoutes[3].children.push(tmp)
+    })
+    this.$router.addRoutes(currentRoutes)
   }
 }
 </script>
 
 <style type="text/css">
 .test {
-position: absolute;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;

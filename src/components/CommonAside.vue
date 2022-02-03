@@ -38,7 +38,6 @@ export default {
       console.log(key, keyPath);
     },
     clickMenu(item) {
-      console.log(item);
       this.$router.push({name: item.name})
       this.$store.commit("selectMenu", item)
     },
