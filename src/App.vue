@@ -6,19 +6,13 @@
 
 <script>
 
-import {ruleMapping} from "./router/dynamic-routers";
+import {initDynamicRouter} from "./router";
 
 export default {
   name: 'App',
   components: {},
   created() {
-    const currentRoutes = this.$router.options.routes
-    const menuList = this.$store.state.userMenuList;
-    menuList.forEach(item => {
-      const tmp = ruleMapping[item.name]
-      currentRoutes[3].children.push(tmp)
-    })
-    this.$router.addRoutes(currentRoutes)
+    initDynamicRouter()
   }
 }
 </script>

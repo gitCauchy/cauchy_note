@@ -24,7 +24,7 @@
 
 <script>
 import {request} from "../network/request";
-import {ruleMapping} from "../router/dynamic-routers";
+import {initDynamicRouter} from "../router";
 
 export default {
 
@@ -60,26 +60,18 @@ export default {
             sessionStorage.setItem("userRole", response.data.userInfo.authorities[0].authority)
             sessionStorage.setItem("token", response.data.token)
             this.$store.commit("setMenuList", response.data.userInfo.menus)
-            console.log(this.$router);
-            this.initDynamicRouter()
+            initDynamicRouter()
             this.$router.push("/home")
           } else {
             this.$message.error("用户名或密码错误")
           }
         }, (failure) => {
+          console.log(failure);
+          console.log(222222222222);
           this.$message.error("网络错误！");
         })
       }
     },
-    initDynamicRouter() {
-      const currentRoutes = this.$router.options.routes
-      const menuList = this.$store.state.userMenuList;
-      menuList.forEach(item => {
-        const tmp = ruleMapping[item.name]
-        currentRoutes[3].children.push(tmp)
-      })
-      this.$router.addRoutes(currentRoutes)
-    }
   }
 }
 </script>

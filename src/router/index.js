@@ -2,7 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from "../components/Login";
 import Register from "../components/Register";
+import NotFound from "../components/NotFound"
 import Main from "../views/Main";
+import store from '../store'
+import {ruleMapping} from "./dynamic-routers";
 import {request} from "../network/request";
 
 const originPush = VueRouter.prototype.push
@@ -39,6 +42,10 @@ const routes = [
       },
     ]
   },
+  {
+    path: '*',
+    component: NotFound
+  }
 ]
 
 const router = new VueRouter({
@@ -56,7 +63,6 @@ router.beforeEach((to, from, next) => {
     if (!token) {
       next({path: '/login'})
     } else {
-      // 发送请求校验 token 是否合法
       request({
         url: '/checkToken',
         method: 'get',
@@ -65,17 +71,25 @@ router.beforeEach((to, from, next) => {
           "username": username
         }
       }, (response) => {
-
         if (!response.data) {
+          // token 校验失败
           next({path: '/login'})
-        } else { // 校验通过
-          console.log(router);
-          next()
         }
-      }, (response) => {
       })
+      next();
     }
   }
 })
+
+
+export function initDynamicRouter() {
+  const currentRoutes = router.options.routes
+  const menuList = store.state.userMenuList;
+  menuList.forEach(item => {
+    const tmp = ruleMapping[item.name]
+    currentRoutes[3].children.push(tmp)
+  })
+  router.addRoutes(currentRoutes)
+}
 
 export default router
