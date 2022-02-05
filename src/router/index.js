@@ -25,7 +25,7 @@ const routes = [
   },
   {
     path: '/',
-    redirect:'Login'
+    redirect: 'Login'
   },
   {
     path: '/home',
@@ -42,18 +42,17 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'history',
   base: process.env.BASE_URL,
+  mode: "history",
   routes
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.path.startsWith('/login')) {
-    sessionStorage.clear()
+  if (to.path === '/login') {
     next()
   } else {
-    let token = sessionStorage.getItem("token")
-    let username = sessionStorage.getItem("username")
+    const token = sessionStorage.getItem("token")
+    const username = sessionStorage.getItem("username")
     if (!token) {
       next({path: '/login'})
     } else {
@@ -66,14 +65,15 @@ router.beforeEach((to, from, next) => {
           "username": username
         }
       }, (response) => {
+
         if (!response.data) {
-          console.log('校验失败');
           next({path: '/login'})
+        } else { // 校验通过
+          console.log(router);
+          next()
         }
       }, (response) => {
-        this.$message.error("网络错误！")
       })
-      next()
     }
   }
 })
