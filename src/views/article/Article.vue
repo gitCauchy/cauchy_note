@@ -18,7 +18,8 @@
       <el-table ref="userTable" :data="articleList" v-loading="listLoading" style="width:100%" border stripe>
         <el-table-column label="#" align="center" type="index"></el-table-column>
         <el-table-column label="标题" width="200" align="center">
-          <template slot-scope="scope"><a href @click="handleRead(scope.$index,scope.row)">{{ scope.row.title }}</a> </template>
+          <template slot-scope="scope"><span
+            style="text-decoration: underline ;color: dodgerblue" @click="handleRead(scope.$index,scope.row)">{{ scope.row.title }}</span> </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center">
           <template slot-scope="scope">{{ scope.row.createTime.substr(0, 10) }}</template>
