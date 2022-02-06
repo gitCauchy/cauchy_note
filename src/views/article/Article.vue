@@ -18,7 +18,7 @@
       <el-table ref="userTable" :data="articleList" v-loading="listLoading" style="width:100%" border stripe>
         <el-table-column label="#" align="center" type="index"></el-table-column>
         <el-table-column label="标题" width="200" align="center">
-          <template slot-scope="scope">{{ scope.row.title }}</template>
+          <template slot-scope="scope"><a href @click="handleRead(scope.$index,scope.row)">{{ scope.row.title }}</a> </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center">
           <template slot-scope="scope">{{ scope.row.createTime.substr(0, 10) }}</template>
@@ -32,6 +32,10 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button-group>
+              <el-tooltip effect="dark" content="阅读" placement="top">
+                <el-button type="primary" icon="el-icon-tickets"
+                           @click="handleRead(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
               <el-tooltip effect="dark" content="编辑" placement="top">
                 <el-button type="primary" icon="el-icon-edit"
                            @click="handleUpdate(scope.$index,scope.row)"></el-button>
@@ -55,18 +59,32 @@
       :page-sizes="[10,15,20]"
       :total="total">
     </el-pagination>
-    <el-dialog :title="isEdit?'编辑':'添加'" :visible.sync="dialogVisible" width="60%">
+    <el-dialog :title="isEdit?'编辑':'添加'" :visible.sync="dialogVisible" :fullscreen=true>
       <el-form :model="article" ref="articleForm" label-width="100px">
         <el-form-item>
-          <el-input v-model="article.title" style="width: 500px"/>
+          <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="article.content" type="textarea" :rows="10" style="width: 500px"/>
+          <el-input v-model="article.content" type="textarea" :rows="20" style="width: 85%"/>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible=false" size="small">取 消</el-button>
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="查看" :visible.sync="readDialogVisible" :fullscreen=true>
+      <el-form :model="article" ref="readArticleForm" label-width="100px">
+        <el-form-item>
+          <el-input v-model="article.title" style="width: 85%" :readonly="true"/>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="article.content" type="textarea" :rows="20" style="width: 85%" :readonly="true"/>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="readDialogVisible=false" type="primary" size="small">关闭</el-button>
       </span>
     </el-dialog>
   </div>
@@ -100,6 +118,7 @@ export default {
       total: null,
       listLoading: false,
       dialogVisible: false,
+      readDialogVisible: false,
       isEdit: false,
       article: Object.assign({}, defaultArticle),
     }
@@ -168,6 +187,10 @@ export default {
     handleUpdate(index, row) {
       this.dialogVisible = true;
       this.isEdit = true;
+      this.article = Object.assign({}, row)
+    },
+    handleRead(index, row) {
+      this.readDialogVisible = true;
       this.article = Object.assign({}, row)
     },
     handleDialogConfirm() {

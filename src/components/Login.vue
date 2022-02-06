@@ -38,9 +38,19 @@ export default {
     }
   },
   created() {
-
+    this.enterLogin()
   },
   methods: {
+    enterLogin() {
+      document.onkeydown = e => {
+        //13表示回车键
+        if (e.keyCode === 13) {
+          //回车后执行搜索方法
+          this.doLogin()
+        }
+      }
+    },
+
     doLogin() {
       if (!this.user.username) {
         this.$message.error("请输入用户名！");
