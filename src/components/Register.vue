@@ -16,7 +16,8 @@
           </el-form-item>
           <el-row>
             <el-button type="primary" @click="doRegister()" style="float:left" size="small">注册账号</el-button>
-            <el-button type="primary" @click="this.$router.replace('/login')" style="float:right" size="small">登录账号</el-button>
+            <el-button type="primary" @click="goToLink('/login')" style="float:right" size="small">登录账号
+            </el-button>
           </el-row>
         </el-form>
       </el-row>
@@ -41,50 +42,41 @@ export default {
   created() {
   },
   methods: {
+    goToLink(link) {
+      this.$router.replace(link)
+    },
     doRegister() {
       if (!this.user.username) {
         this.$message.error("请输入用户名！");
-        return;
+
       } else if (!this.user.email) {
         this.$message.error("请输入邮箱！");
-        return;
-      } else if (this.user.email != null) {
+      } else {
         var reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
         if (!reg.test(this.user.email)) {
           this.$message.error("请输入有效的邮箱！");
         } else if (!this.user.password) {
           this.$message.error("请输入密码！");
-          return;
         } else {
-          // this.$router.push({ path: "/" }); //无需向后台提交数据，方便前台调试
           request({
             url: '/register',
             method: 'post',
             data: this.user
-          }, () => {
-            console.log('success');
+          }, (response) => {
+            if (response.data === 100000) {
+              this.$message.success("注册成功！跳转至登录页面... ...")
+              this.$router.push('/login')
+            } else if (response.data === -300000) {
+              this.$message.error("用户已存在！")
+            }
           }, () => {
             console.log('failure');
           })
-
-          axios
-            .post("/register/", {
-              name: this.user.username,
-              email: this.user.email,
-              password: this.user.password
-            })
-            .then(res => {
-              if (res.data.status === 200) {
-                this.$router.push({path: "/"});
-              } else {
-                alert("您输入的用户名已存在！");
-              }
-            });
         }
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>

@@ -13,8 +13,8 @@
           </el-form-item>
           <el-row style="margin: 20px">
             <el-button type="primary" @click="doLogin" size="small">登录账号</el-button>
-            <el-button type="success" @click="this.$router.replace('/')" size="small">找回密码</el-button>
-            <el-button type="info" @click="this.$router.replace('/register')" size="small">注册账号</el-button>
+            <el-button type="success" @click="goToLink()" size="small" :disabled="true">找回密码</el-button>
+            <el-button type="info" @click="goToLink('/register')" size="small">注册账号</el-button>
           </el-row>
         </el-form>
       </el-row>
@@ -33,7 +33,7 @@ export default {
     return {
       user: {
         username: "",
-        password: ""
+        password: "",
       },
     }
   },
@@ -41,6 +41,9 @@ export default {
     this.enterLogin()
   },
   methods: {
+    goToLink(link) {
+      this.$router.replace(link)
+    },
     enterLogin() {
       document.onkeydown = e => {
         //13表示回车键
@@ -77,7 +80,6 @@ export default {
           }
         }, (failure) => {
           console.log(failure);
-          console.log(222222222222);
           this.$message.error("网络错误！");
         })
       }
