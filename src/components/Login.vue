@@ -12,7 +12,7 @@
             <el-input v-model="user.password" show-password placeholder="请输入密码" prefix-icon="el-icon-lock"></el-input>
           </el-form-item>
           <el-row style="margin: 20px">
-            <el-button type="primary" @click="doLogin" size="small">登录账号</el-button>
+            <el-button type="primary" @keyup.enter.native="enterLogin" @click="doLogin" size="small">登录账号</el-button>
             <el-button type="success" @click="goToLink()" size="small" :disabled="true">找回密码</el-button>
             <el-button type="info" @click="goToLink('/register')" size="small">注册账号</el-button>
           </el-row>
@@ -38,18 +38,19 @@ export default {
     }
   },
   created() {
-    this.enterLogin()
+    this.enterLogin();
   },
   methods: {
     goToLink(link) {
       this.$router.replace(link)
     },
-    enterLogin() {
-      document.onkeydown = e => {
-        //13表示回车键
-        if (e.keyCode === 13) {
+
+    enterLogin(){
+      document.onkeydown = e =>{
+        //13表示回车键，baseURI是当前页面的地址，为了更严谨，也可以加别的，可以打印e看一下
+        if (e.keyCode === 13 && e.target.baseURI.match(/login/)) {
           //回车后执行搜索方法
-          this.doLogin()
+          this.doLogin();
         }
       }
     },

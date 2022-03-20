@@ -121,7 +121,7 @@ export default {
       url: '/article/getCountData',
       method: 'get',
       params: {
-        "authorId": 13
+        "authorId": sessionStorage.getItem("user_id")
       }
     }, (response) => {
       this.countData[0].value = response.data.userLoginData.countOfWeek;
