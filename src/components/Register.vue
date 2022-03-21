@@ -53,7 +53,7 @@ export default {
           {validator: validQC, trigger: 'blur'},
           {min: 6, max: 14, message: '长度在4-16字符之间', trigger: "blur"}
         ],
-        password: [{min: 6, max: 14, message: '长度在4-16字符之间', trigger: "blur"}]
+        password: [{min: 6, max: 14, message: '长度在6-16字符之间', trigger: "blur"}]
       },
     };
   },
