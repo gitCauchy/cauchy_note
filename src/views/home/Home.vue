@@ -55,6 +55,7 @@ export default {
   name: "Home",
   data() {
     return {
+      userId: sessionStorage.getItem("user_id"),
       username: sessionStorage.getItem("username"),
       userRole: sessionStorage.getItem("userRole"),
       tableData: null,
@@ -121,7 +122,7 @@ export default {
       url: '/article/getCountData',
       method: 'get',
       params: {
-        "authorId": sessionStorage.getItem("user_id")
+        "authorId": this.userId
       }
     }, (response) => {
       this.countData[0].value = response.data.userLoginData.countOfWeek;

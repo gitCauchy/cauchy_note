@@ -11,7 +11,7 @@
     </el-card>
     <el-form class="operation-container" shadow="never">
       <i class="el-icon-tickets"/>
-      <span>数据列表</span>
+      <span>笔记列表</span>
       <el-button size="mini" type="primary" class="btn-add" @click="handleAdd()" style="margin:20px">添加</el-button>
     </el-form>
     <div class="data-container">
