@@ -2,7 +2,7 @@
   <div class="login clearfix">
     <div class="login-wrap">
       <el-row type="flex" justify="center">
-        <el-form ref="loginForm" :model="user" status-icon label-width="80px">
+        <el-form ref="user" :rules="rules" :model="user" status-icon label-width="80px">
           <h3>注册</h3>
           <hr>
           <el-form-item prop="username" label="用户名：" class="form_username">
@@ -31,11 +31,29 @@ import {request} from "../network/request";
 export default {
   name: "login",
   data() {
+    const validQC = (rule, value, callback) => {
+      if (value) {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error("字母，数字，英文符号组成，不可为汉字"));
+        } else {
+          // 验证通过
+          callback();
+        }
+        callback();
+      }
+    };
     return {
       user: {
         username: "",
         email: "",
         password: ""
+      },
+      rules: {
+        username: [
+          {validator: validQC, trigger: 'blur'},
+          {min: 6, max: 14, message: '长度在4-16字符之间', trigger: "blur"}
+        ],
+        password: [{min: 6, max: 14, message: '长度在4-16字符之间', trigger: "blur"}]
       },
     };
   },
