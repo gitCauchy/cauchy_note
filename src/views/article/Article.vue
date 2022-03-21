@@ -66,7 +66,7 @@
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="article.content" type="textarea" :rows="20" style="width: 85%"/>
+          <el-input v-model="article.content" type="textarea" :rows="15" style="width: 85%"/>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
