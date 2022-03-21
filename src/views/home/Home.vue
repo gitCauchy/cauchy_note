@@ -85,7 +85,7 @@ export default {
         },
         {
           name: '本周新增笔记',
-          value: 1234,
+          value: null,
           icon: 'position',
           color: '#FF8247'
         },
