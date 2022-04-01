@@ -33,9 +33,6 @@ export default {
       setup: (editor) => {
         editor.on('init', (e) => {
           editor.setContent(this.content);
-          console.log("****");
-          console.log(this.content);
-          console.log("****");
         });
       },
       // 监听 input 和 change 事件
