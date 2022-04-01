@@ -18,8 +18,7 @@
       <el-table ref="userTable" :data="articleList" v-loading="listLoading" style="width:100%" border stripe>
         <el-table-column label="#" align="center" type="index"></el-table-column>
         <el-table-column label="标题" width="200" align="center">
-          <template slot-scope="scope"><span
-            style="text-decoration: underline ;color: dodgerblue" @click="handleRead(scope.$index,scope.row)">{{ scope.row.title }}</span> </template>
+          <template slot-scope="scope">{{ scope.row.title }}</template>
         </el-table-column>
         <el-table-column label="创建时间" align="center">
           <template slot-scope="scope">{{ scope.row.createTime.substr(0, 10) }}</template>
@@ -33,10 +32,6 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button-group>
-              <el-tooltip effect="dark" content="阅读" placement="top">
-                <el-button type="primary" icon="el-icon-tickets"
-                           @click="handleRead(scope.$index,scope.row)"></el-button>
-              </el-tooltip>
               <el-tooltip effect="dark" content="编辑" placement="top">
                 <el-button type="primary" icon="el-icon-edit"
                            @click="handleUpdate(scope.$index,scope.row)"></el-button>
@@ -66,33 +61,22 @@
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="article.content" type="textarea" :rows="15" style="width: 85%"/>
+          <TinymceEditor :parent-content="article.content" @input="handleTinymceInput"
+                         :key="tinymceKey"></TinymceEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible=false" size="small">取 消</el-button>
+        <el-button @click="handleCancel" size="small">取 消</el-button>
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
       </span>
     </el-dialog>
 
-    <el-dialog title="查看" :visible.sync="readDialogVisible" :fullscreen=true>
-      <el-form :model="article" ref="readArticleForm" label-width="100px">
-        <el-form-item>
-          <el-input v-model="article.title" style="width: 85%" :readonly="true"/>
-        </el-form-item>
-        <el-form-item>
-          <el-input v-model="article.content" type="textarea" :rows="20" style="width: 85%" :readonly="true"/>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="readDialogVisible=false" type="primary" size="small">关闭</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import {request} from "../../network/request";
+import {request} from "@/network/request";
+import TinymceEditor from "@/components/tinymce-editor";
 
 const defaultQueryInfo = {
   pageNum: 1,
@@ -102,8 +86,8 @@ const defaultQueryInfo = {
 
 const defaultArticle = {
   id: null,
-  title: null,
-  content: null,
+  title: '',
+  content: '',
   createTime: null,
   authorId: sessionStorage.getItem("user_id"),
   modifyTime: null,
@@ -112,6 +96,7 @@ const defaultArticle = {
 
 export default {
   name: "articleList",
+  components: {TinymceEditor},
   data() {
     return {
       queryInfo: Object.assign({}, defaultQueryInfo),
@@ -128,6 +113,9 @@ export default {
     this.getList();
   },
   methods: {
+    handleTinymceInput(value) {
+      this.article.content = value;
+    },
     handleDisplay(content) {
       if (content.length <= 10) {
         return content;
@@ -190,10 +178,6 @@ export default {
       this.isEdit = true;
       this.article = Object.assign({}, row)
     },
-    handleRead(index, row) {
-      this.readDialogVisible = true;
-      this.article = Object.assign({}, row)
-    },
     handleDialogConfirm() {
       if (this.isEdit) {
         request({
@@ -226,11 +210,16 @@ export default {
           console.log(failure);
         })
       }
+      this.$router.go(0)
+    },
+    handleCancel(){
+      this.dialogVisible=false;
+      this.$router.go(0);
     },
     handleAdd() {
+      this.article = Object.assign({}, defaultArticle)
       this.dialogVisible = true;
       this.isEdit = false;
-      this.article = Object.assign({}, defaultArticle)
     },
 
     handleSearchList() {
