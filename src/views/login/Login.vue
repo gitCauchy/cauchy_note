@@ -1,15 +1,15 @@
 <template>
-  <div class="register">
-    <div class="register-wrap">
+  <div class="login">
+    <div class="login-wrap">
       <el-row type="flex" justify="center">
-        <el-form ref="loginForm" :model="user" status-icon label-width="80px">
+        <el-form ref="loginForm" :model="loginForm" status-icon label-width="80px">
           <h3>登录</h3>
           <hr>
           <el-form-item prop="username" label="用户名：" class="form_username">
-            <el-input v-model="user.username" placeholder="请输入用户名" prefix-icon="el-icon-user"></el-input>
+            <el-input v-model="loginForm.username" placeholder="请输入用户名" prefix-icon="el-icon-user"></el-input>
           </el-form-item>
           <el-form-item id="password" prop="password" label="密码：" class="form_password">
-            <el-input v-model="user.password" show-password placeholder="请输入密码" prefix-icon="el-icon-lock"></el-input>
+            <el-input v-model="loginForm.password" show-password placeholder="请输入密码" prefix-icon="el-icon-lock"></el-input>
           </el-form-item>
           <el-row style="margin: 20px">
             <el-button type="primary" @keyup.enter.native="enterLogin" @click="doLogin" size="small">登录账号</el-button>
@@ -31,7 +31,7 @@ export default {
   name: "Login",
   data() {
     return {
-      user: {
+      loginForm: {
         username: "",
         password: "",
       },
@@ -56,20 +56,20 @@ export default {
     },
 
     doLogin() {
-      if (!this.user.username) {
+      if (!this.loginForm.username) {
         this.$message.error("请输入用户名！");
-      } else if (!this.user.password) {
+      } else if (!this.loginForm.password) {
         this.$message.error("请输入密码！");
       } else {
         // 校验用户名，密码
         request({
           url: '/login',
           method: 'post',
-          data: this.user
+          data: this.loginForm
         }, (response) => {
           if (response.data.SystemStatusCode === 100000) { // 登录验证通过
             // 1. 将登录成功后的 token 保存到客户端的 sessionStorage 中
-            sessionStorage.setItem("username", this.user.username)
+            sessionStorage.setItem("username", this.loginForm.username)
             sessionStorage.setItem("email", response.data.userInfo.email)
             sessionStorage.setItem("user_id", response.data.userInfo.id)
             sessionStorage.setItem("userRole", response.data.userInfo.authorities[0].authority)
@@ -91,7 +91,7 @@ export default {
 </script>
 
 <style scoped>
-.register {
+.login {
   width: 100%;
   height: 100%;
   background: url("../../assets/img/login_background.jpg") no-repeat;
@@ -99,7 +99,7 @@ export default {
   overflow: hidden;
 }
 
-.register-wrap {
+.login-wrap {
   width: 400px;
   height: 300px;
   margin: 100px auto;

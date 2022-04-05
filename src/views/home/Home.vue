@@ -10,8 +10,8 @@
           </div>
         </div>
         <div class="login-info">
-          <p>当前日期：<span>{{ current_date }}</span></p>
-          <p>当前时间：<span>{{ current_time }}</span></p>
+          <p>当前日期：<span>{{ date|formatDate }}</span></p>
+          <p>当前时间：<span>{{ date|formatTime }}</span></p>
         </div>
       </el-card>
       <el-card style="margin-top:20px;height: 230px">
@@ -49,12 +49,15 @@
 
 <script>
 import * as echars from 'echarts'
-import {request} from "../../network/request";
+import {request} from "@/network/request";
+import {formatDate} from "@/utils/date";
+import {formatTime} from "@/utils/date";
 
 export default {
   name: "Home",
   data() {
     return {
+      date: new Date(),
       userId: sessionStorage.getItem("user_id"),
       username: sessionStorage.getItem("username"),
       userRole: sessionStorage.getItem("userRole"),
@@ -104,9 +107,11 @@ export default {
         }
       ],
       trendData: null,
-      current_time: null,
-      current_date: null,
     }
+  },
+  filters: {
+    formatDate: formatDate,
+    formatTime:formatTime
   },
   created() {
     const current = new Date()
@@ -115,8 +120,7 @@ export default {
   mounted() {
     let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
     this.timer = setInterval(() => {
-      _this.current_date = this.getDate(); // 修改数据date
-      _this.current_time = this.getTime()
+      _this.date = new Date(); // 修改数据date
     }, 1000)
     request({
       url: '/article/getCountData',

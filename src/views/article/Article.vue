@@ -26,9 +26,6 @@
         <el-table-column label="修改时间" align="center">
           <template slot-scope="scope">{{ scope.row.modifyTime.substr(0, 10) }}</template>
         </el-table-column>
-        <el-table-column label="内容" align="center">
-          <template slot-scope="scope">{{ handleDisplay(scope.row.content) }}</template>
-        </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button-group>
@@ -61,8 +58,7 @@
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <TinymceEditor :parent-content="article.content" @input="handleTinymceInput"
-                         :key="tinymceKey"></TinymceEditor>
+          <TinymceEditor :parent-content="article.content" @input="handleTinymceInput"></TinymceEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
