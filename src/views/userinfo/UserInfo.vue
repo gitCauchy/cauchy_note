@@ -37,7 +37,7 @@ export default {
   name: "UserInfo",
   data() {
 
-    const validatePass = (rule, value, callback) => {
+    const validateNewpassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'));
       } else {
@@ -47,7 +47,7 @@ export default {
         callback();
       }
     };
-    const validatePass2 = (rule, value, callback) => {
+    const validateCheckNewpassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'));
       } else if (value !== this.userInfoForm.newPassword) {
@@ -66,10 +66,10 @@ export default {
       },
       rules: {
         newPassword: [
-          {validator: validatePass, trigger: 'blur'}
+          {validator: validateNewpassword, trigger: 'blur'}
         ],
         checkNewPassword: [
-          {validator: validatePass2, trigger: 'blur'}
+          {validator: validateCheckNewpassword, trigger: 'blur'}
         ],
       }
     };
