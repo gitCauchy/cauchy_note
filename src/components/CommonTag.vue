@@ -23,7 +23,6 @@ export default {
       close: "closeTag"
     }),
     changeMenu(item) {
-      console.log('111111111');
       this.$router.push({name: item.name});
       this.$store.commit("selectMenu", item);
     },

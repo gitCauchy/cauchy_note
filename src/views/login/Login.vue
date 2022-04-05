@@ -1,6 +1,6 @@
 <template>
-  <div class="login">
-    <div class="login-wrap">
+  <div class="register">
+    <div class="register-wrap">
       <el-row type="flex" justify="center">
         <el-form ref="loginForm" :model="user" status-icon label-width="80px">
           <h3>登录</h3>
@@ -13,7 +13,7 @@
           </el-form-item>
           <el-row style="margin: 20px">
             <el-button type="primary" @keyup.enter.native="enterLogin" @click="doLogin" size="small">登录账号</el-button>
-            <el-button type="success" @click="goToLink()" size="small" :disabled="true">找回密码</el-button>
+            <el-button type="success" @click="goToLink('/resetPassword')" size="small">找回密码</el-button>
             <el-button type="info" @click="goToLink('/register')" size="small">注册账号</el-button>
           </el-row>
         </el-form>
@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import {request} from "../network/request";
-import {initDynamicRouter} from "../router";
+import {request} from "../../network/request";
+import {initDynamicRouter} from "../../router";
 
 export default {
 
@@ -45,8 +45,8 @@ export default {
       this.$router.replace(link)
     },
 
-    enterLogin(){
-      document.onkeydown = e =>{
+    enterLogin() {
+      document.onkeydown = e => {
         //13表示回车键，baseURI是当前页面的地址，为了更严谨，也可以加别的，可以打印e看一下
         if (e.keyCode === 13 && e.target.baseURI.match(/login/)) {
           //回车后执行搜索方法
@@ -70,6 +70,7 @@ export default {
           if (response.data.SystemStatusCode === 100000) { // 登录验证通过
             // 1. 将登录成功后的 token 保存到客户端的 sessionStorage 中
             sessionStorage.setItem("username", this.user.username)
+            sessionStorage.setItem("email", response.data.userInfo.email)
             sessionStorage.setItem("user_id", response.data.userInfo.id)
             sessionStorage.setItem("userRole", response.data.userInfo.authorities[0].authority)
             sessionStorage.setItem("token", response.data.token)
@@ -90,15 +91,15 @@ export default {
 </script>
 
 <style scoped>
-.login {
+.register {
   width: 100%;
   height: 100%;
-  background: url("../assets/img/login_background.jpg") no-repeat;
+  background: url("../../assets/img/login_background.jpg") no-repeat;
   background-size: cover;
   overflow: hidden;
 }
 
-.login-wrap {
+.register-wrap {
   width: 400px;
   height: 300px;
   margin: 100px auto;

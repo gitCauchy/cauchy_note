@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from "../components/Login";
-import Register from "../components/Register";
+import Login from "../views/login/Login";
+import Register from "../views/login/Register";
+import ResetPassword from "../views/login/ResetPassword";
 import NotFound from "../components/NotFound"
 import Main from "../views/Main";
 import store from '../store'
 import {ruleMapping} from "./dynamic-routers";
-import {request} from "../network/request";
+import {request} from "@/network/request";
 
 const originPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -25,6 +26,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/resetPassword',
+    name: 'ResetPassword',
+    component: ResetPassword
   },
   {
     path: '/',
@@ -87,7 +93,7 @@ export function initDynamicRouter() {
   const menuList = store.state.userMenuList;
   menuList.forEach(item => {
     const tmp = ruleMapping[item.name]
-    currentRoutes[3].children.push(tmp)
+    currentRoutes[4].children.push(tmp)
   })
   router.addRoutes(currentRoutes)
 }

@@ -1,6 +1,6 @@
 <template>
-  <div class="login clearfix">
-    <div class="login-wrap">
+  <div class="register">
+    <div class="register-wrap">
       <el-row type="flex" justify="center">
         <el-form ref="user" :rules="rules" :model="user" status-icon label-width="80px">
           <h3>注册</h3>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import {request} from "../network/request";
+import {request} from "../../network/request";
 
 export default {
   name: "login",
@@ -98,15 +98,15 @@ export default {
 </script>
 
 <style scoped>
-.login {
+.register {
   width: 100%;
   height: 100%;
-  background: url("../assets/img/login_background.jpg") no-repeat;
+  background: url("../../assets/img/login_background.jpg") no-repeat;
   background-size: cover;
   overflow: hidden;
 }
 
-.login-wrap {
+.register-wrap {
   width: 400px;
   height: 320px;
   margin: 100px auto;

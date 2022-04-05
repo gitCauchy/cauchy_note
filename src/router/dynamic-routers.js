@@ -27,12 +27,19 @@ const articleRule = {
   component: () => import('../views/article/Article')
 }
 
+const userInfoRule = {
+  path: '/userinfo',
+  name: 'userinfo',
+  component: () => import('../views/userinfo/UserInfo')
+}
+
 const ruleMapping = {
   'user': userRule,
   'role': roleRule,
   'permission': permissionRule,
   'menu': menuRule,
   'article': articleRule,
+  'userinfo': userInfoRule,
 }
 
-export {userRule, roleRule, permissionRule, menuRule, articleRule, ruleMapping}
+export {userRule, roleRule, permissionRule, menuRule, articleRule, userInfoRule, ruleMapping}
