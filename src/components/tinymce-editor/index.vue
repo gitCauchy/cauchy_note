@@ -21,7 +21,6 @@ export default {
     }
   },
   mounted() {
-    console.log("组件得到调用");
     tinymce.init({
       selector: '#tinymce-editor',
       branding: false,

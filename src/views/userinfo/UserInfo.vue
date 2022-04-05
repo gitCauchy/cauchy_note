@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-form :model="userInfoForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" style="width: 55%"
-             class="demo-ruleForm">
+    <el-form :model="userInfoForm" status-icon :rules="rules" ref="userInfoForm" label-width="100px" style="width: 55%"
+             class="modify-password-ruleForm">
       <h3>用户基本信息</h3>
       <el-form-item label="用户名">
         <el-input type="text" v-model="username" readonly/>
@@ -23,14 +23,16 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="">确认修改</el-button>
-        <el-button @click="">重置表单</el-button>
+        <el-button type="primary" @click="modifyPasswrod">确认修改</el-button>
+        <el-button @click="resetForm">重置表单</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
+import {request} from "@/network/request";
+
 export default {
   name: "UserInfo",
   data() {
@@ -39,8 +41,8 @@ export default {
       if (value === '') {
         callback(new Error('请输入密码'));
       } else {
-        if (this.userInfoForm.newPassword !== '') {
-          this.$refs.ruleForm.validateField('newPassword');
+        if (this.userInfoForm.checkNewPassword !== '') {
+          this.$refs.userInfoForm.validateField('checkNewpassword');
         }
         callback();
       }
@@ -73,11 +75,36 @@ export default {
     };
   },
   methods: {
-    modifyPassword() {
-
+    modifyPasswrod() {
+      this.$refs['userInfoForm'].validate((valid) => {
+        if (!valid) {
+          this.$message.error("按要求填写信息！")
+        } else {
+          request({
+            url: '/user/modifyPassword',
+            method: 'post',
+            data: {
+              'username': this.username,
+              'oldPassword': this.userInfoForm.oldPassword,
+              'newPassword': this.userInfoForm.newPassword,
+            }
+          }, (response) => {
+            if (response.data.SystemStatusCode === 100000) {
+              this.$message.success("修改成功！")
+            } else {
+              this.$message.error("密码错误！")
+            }
+          }, (failure) => {
+            console.log(failure);
+            this.$message.error("网络错误！")
+          })
+        }
+      });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.userInfoForm.oldPassword = '';
+      this.userInfoForm.newPassword = '';
+      this.userInfoForm.checkNewPassword = ''
     }
   }
 }
