@@ -99,8 +99,9 @@ export default {
         } else {
           this.isGeting = true
           this.isDisabled = true
+          this.getCode = this.count-- + 's后重发'
         }
-      })
+      },1000)
       request({
         url: '/user/sendCheckCode',
         method: 'get',
@@ -110,7 +111,7 @@ export default {
       }, (response) => {
         if (response.data.SystemStatusCode === 100000) {
           this.$message.success("验证码发送成功！")
-          this.getCode = this.count-- + 's后重发'
+
         } else {
           this.$message.error("系统异常，请稍后再试！")
         }
