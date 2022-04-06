@@ -50,7 +50,9 @@ const routes = [
   },
   {
     path: '*',
-    component: NotFound
+    redirect: {
+      component: NotFound
+    }
   }
 ]
 

@@ -17,11 +17,11 @@
           <el-input v-model="resetPasswordForm.checkCode"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="resetPasswordForm.password" autocomplete="off"></el-input>
+          <el-input type="password" show-password v-model="resetPasswordForm.password" autocomplete="off"></el-input>
         </el-form-item>
 
         <el-form-item label="确认密码" prop="checkPassword">
-          <el-input type="password" v-model="resetPasswordForm.checkPassword" autocomplete="off"></el-input>
+          <el-input type="password" show-password v-model="resetPasswordForm.checkPassword" autocomplete="off"></el-input>
         </el-form-item>
 
         <el-form-item>
