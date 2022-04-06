@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style scoped>
-.login {
+.register {
   width: 100%;
   height: 100%;
   background: url("../../assets/img/login_background.jpg") no-repeat;
