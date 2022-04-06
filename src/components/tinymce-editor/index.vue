@@ -25,7 +25,7 @@ export default {
       selector: '#tinymce-editor',
       branding: false,
       width: '85%',
-      height: 350,
+      height: 400,
       language: 'zh_CN',
       plugins: 'preview',
       menubar: false,

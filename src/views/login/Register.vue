@@ -43,7 +43,7 @@ export default {
 
     const validEmail = (rule, value, callback) => {
       if (value) {
-        if (/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
+        if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
           callback(new Error("邮箱格式错误"));
         }
         callback();
@@ -77,7 +77,7 @@ export default {
           request({
             url: '/register',
             method: 'post',
-            data: this.user
+            data: this.registerForm
           }, (response) => {
             if (response.data === 100000) {
               this.$message.success("注册成功！跳转至登录页面... ...")
