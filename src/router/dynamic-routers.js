@@ -33,6 +33,12 @@ const userInfoRule = {
   component: () => import('../views/userinfo/UserInfo')
 }
 
+const friendRule = {
+  path: '/friend',
+  name: 'friend',
+  component: () => import('../views/friend/Friend')
+}
+
 const ruleMapping = {
   'user': userRule,
   'role': roleRule,
@@ -40,6 +46,7 @@ const ruleMapping = {
   'menu': menuRule,
   'article': articleRule,
   'userinfo': userInfoRule,
+  'friend': friendRule,
 }
 
-export {userRule, roleRule, permissionRule, menuRule, articleRule, userInfoRule, ruleMapping}
+export {userRule, roleRule, permissionRule, menuRule, articleRule, userInfoRule, friendRule, ruleMapping}
