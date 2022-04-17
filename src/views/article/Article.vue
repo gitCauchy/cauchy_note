@@ -33,6 +33,10 @@
                 <el-button type="primary" icon="el-icon-edit"
                            @click="handleUpdate(scope.$index,scope.row)"></el-button>
               </el-tooltip>
+              <el-tooltip effect="dark" content="分享" placement="top">
+                <el-button type="primary" icon="el-icon-share"
+                           @click="handleShare(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
               <el-tooltip effect="dark" content="删除" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
                            @click="handleDelete(scope.$index, scope.row)"></el-button>
@@ -66,6 +70,32 @@
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="分享" :visible.sync="shareDialogVisible" :fullscreen=false>
+      <el-form ref="shareForm" label-width="100px">
+        <el-form-item label="分享好友:">
+          <el-select v-model="friendSelectValue" placeholder="请选择好友" style="width: 75%">
+            <el-option v-for="item in friendOptions" :key="item.value" :label="item.label" :value=item.value>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="分享期限">
+          <el-select v-model="validDaySelectValue" placeholder="请选择期限" style="width: 75%">
+            <el-option v-for="item in validDayOptions" :key="item.value" :label="item.label" :value=item.value>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="能否编辑">
+          <el-select v-model="isRevisableSelectValue" placeholder="请选择是否允许编辑" style="width: 75%">
+            <el-option v-for="item in isRevisableOptions" :key="item.value" :label="item.label" :value=item.value>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
 
   </div>
 </template>
@@ -89,6 +119,22 @@ export default {
   components: {TinymceEditor},
   data() {
     return {
+      shareDialogVisible: false,
+      friendOptions: [],
+      friendSelectValue: '',
+      validDaySelectValue: '',
+      validDayOptions: [
+        {value: 1, label: '1 天'},
+        {value: 3, label: '3 天'},
+        {value: 7, label: '7 天'},
+        {value: 30, label: '30 天'},
+        {value: 180, label: '180 天'},
+      ],
+      isRevisableSelectValue: '',
+      isRevisableOptions: [
+        {value: 1, label: '是'},
+        {value: 0, label: '否'}
+      ],
       queryInfo: {
         pageNum: 1,
         pageSize: 10,
@@ -104,6 +150,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getFriendList();
   },
   methods: {
     handleTinymceInput(value) {
@@ -124,6 +171,22 @@ export default {
     handleCurrentChange(value) {
       this.queryInfo.pageNum = value;
       this.getList();
+    },
+    getFriendList() {
+      request({
+        url: '/friend/getFriendList',
+        method: 'get',
+        params: {
+          "userId": sessionStorage.getItem("user_id")
+        }
+      }, (response) => {
+        console.log(response.data[1]);
+        for (let i = 0; i < response.data.length; i++) {
+          this.friendOptions.push({value: response.data[i].id, label: response.data[i].username})
+        }
+      }, (failure) => {
+        console.log(failure);
+      })
     },
     getList() {
       this.listLoading = true;
@@ -222,6 +285,9 @@ export default {
     handleSearchReset() {
       this.queryInfo = Object.assign({}, defaultQueryInfo)
     },
+    handleShare() {
+      this.shareDialogVisible = true;
+    }
   }
 }
 </script>

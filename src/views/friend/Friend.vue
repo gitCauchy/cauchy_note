@@ -23,7 +23,7 @@
             <el-button-group>
               <el-tooltip effect="dark" content="分享" placement="top">
                 <el-button type="primary" icon="el-icon-share"
-                           @click=""></el-button>
+                           @click="handleShare(scope.$index,scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip effect="dark" content="删除" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
@@ -56,16 +56,38 @@
         <el-button @click="handleCancel" size="small">关 闭</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog title="分享" :visible.sync="shareDialogVisible" :fullscreen=false>
+      <el-form ref="shareForm" label-width="100px">
+        <el-form-item label="分享笔记:">
+          <el-select v-model="articleSelectValue" placeholder="请选择好友" style="width: 75%">
+            <el-option v-for="item in articleOptions" :key="item.value" :label="item.label" :value=item.value>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="分享期限">
+          <el-select v-model="validDaySelectValue" placeholder="请选择期限" style="width: 75%">
+            <el-option v-for="item in validDayOptions" :key="item.value" :label="item.label" :value=item.value>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="能否编辑">
+          <el-select v-model="isRevisableSelectValue" placeholder="请选择是否允许编辑" style="width: 75%">
+            <el-option v-for="item in isRevisableOptions" :key="item.value" :label="item.label" :value=item.value>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {request} from "@/network/request";
-
-const defaultQueryInfo = {
-  pageNum: 1,
-  pageSize: 10,
-};
 
 const defaultFriend = {
   id: null,
@@ -78,7 +100,25 @@ export default {
   components: {},
   data() {
     return {
-      queryInfo: Object.assign({}, defaultQueryInfo),
+      articleSelectValue: '',
+      articleOptions: [],
+      validDaySelectValue: '',
+      validDayOptions: [
+        {value: 1, label: '1 天'},
+        {value: 3, label: '3 天'},
+        {value: 7, label: '7 天'},
+        {value: 30, label: '30 天'},
+        {value: 180, label: '180 天'},
+      ],
+      isRevisableSelectValue: '',
+      isRevisableOptions: [
+        {value: 1, label: '是'},
+        {value: 0, label: '否'}],
+      shareDialogVisible: false,
+      queryInfo: {
+        pageNum: 1,
+        pageSize: 10,
+      },
       friendList: null,
       total: 0,
       listLoading: false,
@@ -95,8 +135,32 @@ export default {
   },
   created() {
     this.getList();
+    this.getArticleList();
   },
   methods: {
+    getArticleList() {
+      request({
+        url: '/article/getArticleList',
+        method: 'get',
+        params: {
+          "authorId": sessionStorage.getItem("user_id"),
+          "pageSize": 1000,
+          "pageNum": 1,
+          "keyword": ''
+        }
+      }, (response) => {
+
+        for (let i = 0; i < response.data.articles.length; i++) {
+          this.articleOptions.push({value: response.data.articles[i].id, label: response.data.articles[i].title})
+        }
+
+      }, (failure) => {
+        console.log(failure);
+      })
+    },
+    handleShare() {
+      this.shareDialogVisible = true;
+    },
     getList() {
       this.listLoading = true;
       request({
