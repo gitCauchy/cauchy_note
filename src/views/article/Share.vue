@@ -1,6 +1,6 @@
 <template>
   <div class="page-container">
-    <el-card class="search-container" shadow="never">
+    <el-card class="search-container" shadow="never" style="margin-bottom: 20px">
       <el-row>
         <el-col :span="15">
           <el-input placeholder="标题" v-model="queryInfo.searchWord" clearable>
@@ -9,11 +9,6 @@
         </el-col>
       </el-row>
     </el-card>
-    <el-form class="operation-container" shadow="never">
-      <i class="el-icon-tickets"/>
-      <span>笔记列表</span>
-      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd()" style="margin:20px">添加</el-button>
-    </el-form>
     <div class="data-container">
       <el-table ref="userTable" :data="articleList" v-loading="listLoading" style="width:100%" border stripe>
         <el-table-column label="#" align="center" type="index"></el-table-column>
@@ -23,21 +18,21 @@
         <el-table-column label="创建时间" align="center">
           <template slot-scope="scope">{{ scope.row.createTime.substr(0, 10) }}</template>
         </el-table-column>
-        <el-table-column label="修改时间" align="center">
-          <template slot-scope="scope">{{ scope.row.modifyTime.substr(0, 10) }}</template>
+        <el-table-column label="分享人" align="center">
+          <template slot-scope="scope">{{ scope.row.shareUsername }}</template>
+        </el-table-column>
+        <el-table-column label="分享时间" align="center">
+          <template slot-scope="scope">{{ scope.row.shareDate.substr(0, 10) }}</template>
+        </el-table-column>
+        <el-table-column label="有效期限" align="center">
+          <template slot-scope="scope">{{ scope.row.validDay }} 天</template>
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button-group>
-              <el-tooltip effect="dark" content="编辑" placement="top">
-                <el-button type="primary" icon="el-icon-edit"
-                           @click="handleUpdate(scope.$index,scope.row)"></el-button>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="删除" placement="top">
-                <el-button type="danger" icon="el-icon-delete"
-                           @click="handleDelete(scope.$index, scope.row)"></el-button>
-              </el-tooltip>
-            </el-button-group>
+            <el-tooltip effect="dark" content="编辑" placement="top">
+              <el-button type="primary" icon="el-icon-edit" :disabled="scope.row.isRevisable === 0"
+                         @click="handleUpdate(scope.$index,scope.row)"></el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -52,7 +47,7 @@
       :page-sizes="[10,15,20]"
       :total="total">
     </el-pagination>
-    <el-dialog :title="isEdit?'编辑':'添加'" :visible.sync="dialogVisible" :fullscreen=true>
+    <el-dialog title="编辑" :visible.sync="dialogVisible" :fullscreen=true>
       <el-form :model="article" ref="articleForm" label-width="100px">
         <el-form-item>
           <el-input v-model="article.title" style="width: 85%"/>
@@ -74,18 +69,21 @@
 import {request} from "@/network/request";
 import TinymceEditor from "@/components/tinymce-editor";
 
-const defaultArticle = {
+const defaultSharedArticle = {
   id: null,
   title: '',
   content: '',
   createTime: null,
+  shareUsername: null,
+  shareDate: null,
   authorId: sessionStorage.getItem("user_id"),
   modifyTime: null,
-  status: 0
+  status: 0,
+  isRevisable:null,
 }
 
 export default {
-  name: "articleList",
+  name: "Share",
   components: {TinymceEditor},
   data() {
     return {
@@ -96,10 +94,11 @@ export default {
       },
       articleList: null,
       total: null,
+      validDay: null,
       listLoading: false,
       dialogVisible: false,
       isEdit: false,
-      article: Object.assign({}, defaultArticle),
+      article: Object.assign({}, defaultSharedArticle),
     }
   },
   created() {
@@ -128,17 +127,17 @@ export default {
     getList() {
       this.listLoading = true;
       request({
-        url: '/article/getArticleList',
+        url: '/share/getSharedArticleList',
         method: 'get',
         params: {
-          "authorId": sessionStorage.getItem("user_id"),
+          "receiverId": sessionStorage.getItem("user_id"),
           "pageSize": this.queryInfo.pageSize,
           "pageNum": this.queryInfo.pageNum,
           "keyword": this.queryInfo.searchWord
         }
       }, (response) => {
         this.listLoading = false;
-        this.articleList = response.data.articles;
+        this.articleList = response.data;
         this.total = response.data.total;
       }, (failure) => {
         console.log(failure);
@@ -210,7 +209,7 @@ export default {
       this.$router.go(0);
     },
     handleAdd() {
-      this.article = Object.assign({}, defaultArticle)
+      this.article = Object.assign({}, defaultSharedArticle)
       this.dialogVisible = true;
       this.isEdit = false;
     },

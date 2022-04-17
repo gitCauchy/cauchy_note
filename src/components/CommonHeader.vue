@@ -13,6 +13,7 @@
           <img src="../assets/img/user.jpg" class="user" alt="UserImg"/>
         </span>
         <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item @click.native="goToLink('/userinfo')">个人资料</el-dropdown-item>
           <el-dropdown-item @click.native="quit()">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -39,7 +40,10 @@ export default {
       sessionStorage.clear()
       // 3. 清除 vuex 中数据, 页面刷新
       window.location.reload()
-    }
+    },
+    goToLink(link) {
+      this.$router.replace(link)
+    },
   },
   computed: {
     ...mapState({

@@ -43,10 +43,10 @@
     </el-pagination>
     <el-dialog title="搜索结果" :visible.sync="searchDialogVisible" :fullscreen=false width="30%">
       <el-form label-position="right" v-if="isNull">
-        <el-form-item label="用户名称：">
+        <el-form-item label="用户名：">
           <el-input v-model="searchResult.username" style="width: 75%" readonly></el-input>
         </el-form-item>
-        <el-form-item label="电子邮箱：">
+        <el-form-item label="邮箱：">
           <el-input v-model="searchResult.email" style="width: 75%" readonly></el-input>
         </el-form-item>
       </el-form>

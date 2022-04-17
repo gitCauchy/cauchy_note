@@ -39,6 +39,12 @@ const friendRule = {
   component: () => import('../views/friend/Friend')
 }
 
+const shareRule = {
+  path: '/share',
+  name: 'share',
+  component: () => import('../views/article/Share')
+}
+
 const ruleMapping = {
   'user': userRule,
   'role': roleRule,
@@ -47,6 +53,7 @@ const ruleMapping = {
   'article': articleRule,
   'userinfo': userInfoRule,
   'friend': friendRule,
+  'share': shareRule,
 }
 
-export {userRule, roleRule, permissionRule, menuRule, articleRule, userInfoRule, friendRule, ruleMapping}
+export {userRule, roleRule, permissionRule, menuRule, articleRule, userInfoRule, friendRule, shareRule, ruleMapping}
