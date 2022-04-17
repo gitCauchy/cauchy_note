@@ -93,7 +93,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCancel" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleShareDialogConfirm()" size="small">分 享</el-button>
       </span>
     </el-dialog>
 
@@ -146,6 +146,8 @@ export default {
       dialogVisible: false,
       isEdit: false,
       article: Object.assign({}, defaultArticle),
+      //article: {},
+      share: {},
     }
   },
   created() {
@@ -180,7 +182,6 @@ export default {
           "userId": sessionStorage.getItem("user_id")
         }
       }, (response) => {
-        console.log(response.data[1]);
         for (let i = 0; i < response.data.length; i++) {
           this.friendOptions.push({value: response.data[i].id, label: response.data[i].username})
         }
@@ -285,8 +286,37 @@ export default {
     handleSearchReset() {
       this.queryInfo = Object.assign({}, defaultQueryInfo)
     },
-    handleShare() {
+    handleShare(index, row) {
+      this.article = Object.assign({}, row);
       this.shareDialogVisible = true;
+    },
+    handleShareDialogConfirm() {
+
+      request({
+          url: '/share/addArticleShare',
+          method: 'post',
+          data: {
+            "shareUserId": sessionStorage.getItem("user_id"),
+            "receiveUserId": this.friendSelectValue.toString(),
+            "articleId": this.article.id.toString(),
+            "validDay": this.validDaySelectValue,
+            "isRevisable":
+            this.isRevisableSelectValue,
+          }
+        },
+        (repsponse) => {
+          if (repsponse.data === 100000) {
+            this.$message({
+              message: '分享成功！',
+              type: 'success'
+            });
+            this.shareDialogVisible = false;
+          }
+
+        }, (failure) => {
+          console.log(failure);
+        }
+      )
     }
   }
 }

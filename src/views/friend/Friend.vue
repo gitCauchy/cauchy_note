@@ -60,7 +60,7 @@
     <el-dialog title="分享" :visible.sync="shareDialogVisible" :fullscreen=false>
       <el-form ref="shareForm" label-width="100px">
         <el-form-item label="分享笔记:">
-          <el-select v-model="articleSelectValue" placeholder="请选择好友" style="width: 75%">
+          <el-select v-model="articleSelectValue" placeholder="请选择笔记" style="width: 75%">
             <el-option v-for="item in articleOptions" :key="item.value" :label="item.label" :value=item.value>
             </el-option>
           </el-select>
@@ -80,7 +80,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCancel" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleShareDialogConfirm" size="small">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -158,8 +158,9 @@ export default {
         console.log(failure);
       })
     },
-    handleShare() {
+    handleShare(index, row) {
       this.shareDialogVisible = true;
+      this.friend = Object.assign({}, row);
     },
     getList() {
       this.listLoading = true;
@@ -256,6 +257,32 @@ export default {
             this.$message.error("网络错误")
           })
       }
+    },
+    handleShareDialogConfirm() {
+      request({
+          url: '/share/addArticleShare',
+          method: 'post',
+          data: {
+            "shareUserId": sessionStorage.getItem("user_id"),
+            "receiveUserId": this.friend.id.toString(),
+            "articleId": this.articleSelectValue.toString(),
+            "validDay": this.validDaySelectValue,
+            "isRevisable": this.isRevisableSelectValue,
+          }
+        },
+        (repsponse) => {
+          if (repsponse.data === 100000) {
+            this.$message({
+              message: '分享成功！',
+              type: 'success'
+            });
+            this.shareDialogVisible = false;
+          }
+
+        }, (failure) => {
+          console.log(failure);
+        }
+      )
     }
   },
 
