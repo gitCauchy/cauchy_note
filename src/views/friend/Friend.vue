@@ -89,15 +89,8 @@
 <script>
 import {request} from "@/network/request";
 
-const defaultFriend = {
-  id: null,
-  username: null,
-  email: null
-}
-
 export default {
   name: "Friend",
-  components: {},
   data() {
     return {
       articleSelectValue: '',
@@ -108,7 +101,6 @@ export default {
         {value: 3, label: '3 天'},
         {value: 7, label: '7 天'},
         {value: 30, label: '30 天'},
-        {value: 180, label: '180 天'},
       ],
       isRevisableSelectValue: '',
       isRevisableOptions: [
@@ -122,7 +114,7 @@ export default {
       friendList: null,
       total: 0,
       listLoading: false,
-      friend: Object.assign({}, defaultFriend),
+      friend: {},
       searchResult: {
         id: null,
         username: null,
@@ -168,7 +160,9 @@ export default {
         url: '/friend/getFriendList',
         method: 'get',
         params: {
-          "userId": sessionStorage.getItem("user_id")
+          "userId": sessionStorage.getItem("user_id"),
+          "pageSize": this.queryInfo.pageSize,
+          "pageNum": this.queryInfo.pageNum
         }
       }, (response) => {
         this.listLoading = false;

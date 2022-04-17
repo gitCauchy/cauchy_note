@@ -104,16 +104,6 @@
 import {request} from "@/network/request";
 import TinymceEditor from "@/components/tinymce-editor";
 
-const defaultArticle = {
-  id: null,
-  title: '',
-  content: '',
-  createTime: null,
-  authorId: sessionStorage.getItem("user_id"),
-  modifyTime: null,
-  status: 0
-}
-
 export default {
   name: "articleList",
   components: {TinymceEditor},
@@ -145,8 +135,7 @@ export default {
       listLoading: false,
       dialogVisible: false,
       isEdit: false,
-      article: Object.assign({}, defaultArticle),
-      //article: {},
+      article: {},
       share: {},
     }
   },
