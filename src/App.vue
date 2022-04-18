@@ -1,5 +1,5 @@
 <template>
-  <div class="test" id="#app">
+  <div class="app" id="#app">
     <router-view></router-view>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
 </script>
 
 <style type="text/css">
-.test {
+.app {
   position: absolute;
   top: 0;
   left: 0;

@@ -218,7 +218,7 @@ export default {
       if (this.isEdit) {
         modifyArticle(this.article.id, this.article.title, this.article.content)
           .then(response => {
-            if (response === true) {
+            if (response === 100000) {
               this.$message.success("修改成功");
               this.dialogVisible = false;
               this.getList();
@@ -230,7 +230,7 @@ export default {
       } else { // 如果是新增窗口
         addArticle(this.article.title, this.article.content, JSON.parse(sessionStorage.userInfo).id)
           .then(response => {
-            if (response === true) {
+            if (response === 100000) {
               this.$message.success("添加成功！");
               this.dialogVisible = false;
               this.getList();
