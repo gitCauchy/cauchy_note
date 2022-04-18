@@ -4,7 +4,7 @@
       <el-row>
         <el-col :span="15">
           <el-input placeholder="标题" v-model="queryInfo.searchWord" clearable>
-            <el-button slot="append" icon="el-icon-search" @click="handleSearchList()"></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="handleSearchList"></el-button>
           </el-input>
         </el-col>
       </el-row>
@@ -66,21 +66,9 @@
 </template>
 
 <script>
-import {request} from "@/network/request";
+import {modifyArticle} from "@/api/article";
+import {getSharedArticleList} from "@/api/share";
 import TinymceEditor from "@/components/tinymce-editor";
-
-const defaultSharedArticle = {
-  id: null,
-  title: '',
-  content: '',
-  createTime: null,
-  shareUsername: null,
-  shareDate: null,
-  authorId: sessionStorage.getItem("user_id"),
-  modifyTime: null,
-  status: 0,
-  isRevisable:null,
-}
 
 export default {
   name: "Share",
@@ -89,7 +77,7 @@ export default {
     return {
       queryInfo: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
         searchWord: ""
       },
       articleList: null,
@@ -98,7 +86,7 @@ export default {
       listLoading: false,
       dialogVisible: false,
       isEdit: false,
-      article: Object.assign({}, defaultSharedArticle),
+      article: {},
     }
   },
   created() {
@@ -126,82 +114,33 @@ export default {
     },
     getList() {
       this.listLoading = true;
-      request({
-        url: '/share/getSharedArticleList',
-        method: 'get',
-        params: {
-          "receiverId": sessionStorage.getItem("user_id"),
-          "pageSize": this.queryInfo.pageSize,
-          "pageNum": this.queryInfo.pageNum,
-          "keyword": this.queryInfo.searchWord
-        }
-      }, (response) => {
-        this.listLoading = false;
-        this.articleList = response.data;
-        this.total = response.data.total;
-      }, (failure) => {
-        console.log(failure);
-      })
+      getSharedArticleList(JSON.parse(sessionStorage.userInfo).id,
+        this.queryInfo.pageSize,
+        this.queryInfo.pageNum,
+        this.queryInfo.searchWord
+      )
+        .then(response => {
+          this.listLoading = false;
+          this.articleList = response;
+          this.total = response.length;
+        })
     },
 
-    handleDelete(index, row) {
-      this.$confirm('是否删除？', '提示',
-        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}).then(() => {
-          request({
-            url: '/article/deleteArticle',
-            method: "get",
-            params: {
-              'id': row.id
-            }
-          }, (response) => {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            });
-            this.getList()
-          }, (failure) => {
-            console.log(failure);
-          })
-        }
-      )
-    },
     handleUpdate(index, row) {
       this.dialogVisible = true;
       this.isEdit = true;
       this.article = Object.assign({}, row)
     },
     handleDialogConfirm() {
-      if (this.isEdit) {
-        request({
-          url: '/article/modifyArticle',
-          method: 'post',
-          data: this.article
-        }, (response) => {
+      modifyArticle(this.article.id, this.article.title, this.article.content)
+        .then(response => {
           this.$message({
             message: '修改成功！',
             type: 'success'
           });
           this.dialogVisible = false;
           this.getList();
-        }, failure => {
-          console.log(failure);
         })
-      } else { // 如果是新增窗口
-        request({
-          url: '/article/addArticle',
-          method: 'post',
-          data: this.article
-        }, (response) => {
-          this.$message({
-            message: '添加成功！',
-            type: 'success'
-          });
-          this.dialogVisible = false;
-          this.getList();
-        }, (failure) => {
-          console.log(failure);
-        })
-      }
       this.$router.go(0)
     },
     handleCancel() {
@@ -209,7 +148,7 @@ export default {
       this.$router.go(0);
     },
     handleAdd() {
-      this.article = Object.assign({}, defaultSharedArticle)
+      this.article = {}
       this.dialogVisible = true;
       this.isEdit = false;
     },
@@ -217,9 +156,6 @@ export default {
     handleSearchList() {
       this.queryInfo.pageNum = 1;
       this.getList();
-    },
-    handleSearchReset() {
-      this.queryInfo = Object.assign({}, defaultQueryInfo)
     },
   }
 }

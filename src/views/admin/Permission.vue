@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import {request} from "../../network/request";
+import {getAllPermissions} from "@/api/admin";
 
 export default {
   name: "Permission",
@@ -23,15 +23,10 @@ export default {
   },
   methods: {
     getPermissionList() {
-      request({
-        url: '/permission/getAllPermissions',
-        method: 'get'
-      }, (response) => {
-        this.permissionList = response.data;
-        console.log(this.permissionList);
-      }, (failure) => {
-        this.$message.error("获取失败！")
-      })
+      getAllPermissions()
+        .then(response => {
+          this.permissionList = response;
+        })
     }
   }
 }

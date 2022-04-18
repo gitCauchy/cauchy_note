@@ -3,8 +3,8 @@
     <el-card class="search-container" shadow="never">
       <el-row>
         <el-col :span="15">
-          <el-input placeholder="角色名称" v-model="queryInfo.keyword" clearable>
-            <el-button slot="append" icon="el-icon-search" @click="handleSearchList()"></el-button>
+          <el-input placeholder="角色名称" v-model="queryInfo.keyword" @keyup.enter.native="handleSearchList" clearable>
+            <el-button slot="append" icon="el-icon-search" @click="handleSearchList"></el-button>
           </el-input>
         </el-col>
       </el-row>
@@ -12,7 +12,7 @@
     <el-form class="operation-container" shadow="never">
       <i class="el-icon-tickets"/>
       <span>数据列表</span>
-      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd()" style="margin:20px">添加</el-button>
+      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd" style="margin:20px">添加</el-button>
     </el-form>
     <div class="data-container">
       <el-table ref="roleTable" :data="list" style="width:100%" v-loading="listLoading" border>
@@ -64,7 +64,7 @@
       </el-form>
       <span slot="footer">
         <el-button @click="dialogVisible=false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDialogConfirm" size="small">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -77,41 +77,37 @@
       </el-select>
       <span slot="footer" class="dialog-footer">
         <el-button @click="distributionDialogVisible=false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDistributeDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDistributeDialogConfirm" size="small">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-import {request} from "../../network/request";
+import {
+  addPermissionOfRole,
+  getAllRoles,
+  getPermissionByRoleId,
+  deleteRole,
+  updateRole,
+  addNewRole,
+  getAllPermissions
+} from "@/api/admin";
 
-const defaultQueryInfo = {
-  pageNum: 1,
-  pageSize: 5,
-  keyword: "",
-
-};
-const defaultRole = {
-  id: null,
-  roleName: null,
-  roleDescription: null,
-};
-const defaultPermission = {
-  id: null,
-  permissionName: null,
-  permissionTag: null,
-};
 export default {
   name: 'roleList',
   data() {
     return {
-      queryInfo: Object.assign({}, defaultQueryInfo),
+      queryInfo: {
+        pageNum: 1,
+        pageSize: 5,
+        keyword: "",
+      },
       list: null,
       total: null,
       listLoading: false,
-      role: Object.assign({}, defaultRole),
+      role: {},
       isEdit: false,
-      permission: Object.assign({}, defaultPermission),
+      permission: {},
       dialogVisible: false,
       distributionRoleId: null,
       distributionDialogVisible: false,
@@ -131,33 +127,21 @@ export default {
     },
     getList() {
       this.listLoading = true;
-      request({
-        url: '/role/getAllRoles',
-        method: 'get',
-        params: {
-          'pageNum': this.queryInfo.pageNum,
-          'pageSize': this.queryInfo.pageSize,
-          'keyword': this.queryInfo.keyword
-        }
-      }, (response) => {
-        this.list = response.data.roles;
-        this.total = response.data.total;
-        this.listLoading = false;
-      }, (faliure) => {
-        console.log(failure);
-      })
+      getAllRoles(this.queryInfo.pageNum, this.queryInfo.pageSize, this.queryInfo.keyword)
+        .then(response => {
+          this.list = response.roles;
+          this.total = response.total;
+          this.listLoading = false;
+        })
     },
     handleSearchList() {
       this.queryInfo.pageNum = 1;
       this.getList();
     },
-    handleSearchReset() {
-      this.queryInfo = Object.assign({}, defaultQueryInfo)
-    },
     handleAdd() {
       this.dialogVisible = true;
       this.isEdit = false;
-      this.role = Object.assign({}, defaultRole)
+      this.role = {};
     },
     handleSelectPermission(index, row) {
       this.distributionRoleId = row.id;
@@ -165,23 +149,16 @@ export default {
       this.getPermissionListByRoleId(row.id);
     },
     getPermissionListByRoleId(roleId) {
-      request({
-        url: '/permission/getPermissionByRoleId',
-        method: 'get',
-        params: {
-          'id': roleId
-        }
-      }, (response) => {
-        let reqPermissionList = response.data;
-        this.permissionIds = [];
-        if (reqPermissionList != null && reqPermissionList.length > 0) {
-          for (let i = 0; i < reqPermissionList.length; i++) {
-            this.permissionIds.push(reqPermissionList[i].id)
+      getPermissionByRoleId(roleId)
+        .then(response => {
+          let reqPermissionList = response;
+          this.permissionIds = [];
+          if (reqPermissionList != null && reqPermissionList.length > 0) {
+            for (let i = 0; i < reqPermissionList.length; i++) {
+              this.permissionIds.push(reqPermissionList[i].id)
+            }
           }
-        }
-      }, (failure) => {
-        console.log(failure);
-      })
+        })
     },
     handleUpdate(index, row) {
       this.dialogVisible = true;
@@ -194,94 +171,49 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        request({
-          url: '/role/deleteRole',
-          method: 'get',
-          params: {
-            'id': row.id,
-          }
-        }, (response) => {
-          this.$message({
-            type: 'success',
-            message: '删除成功！',
-          });
-          this.getList();
-        }, (failure) => {
-          console.log(failure);
-        })
+        deleteRole(row.id)
+          .then(response => {
+            this.$message.success("删除成功！");
+            this.getList();
+          })
       })
     },
     handleDialogConfirm() {
       if (this.isEdit) { // 更新操作
-        request({
-          url: '/role/updateRole',
-          method: 'post',
-          data: this.role,
-        }, (response) => {
-          this.$message(
-            {
-              type: 'success',
-              message: '修改成功'
-            }
-          );
-          this.dialogVisible = false;
-          this.getList();
-        }, (failure) => {
-          console.log(failure);
-        })
+        updateRole(this.role)
+          .then(response => {
+            this.$message.success("修改成功！");
+            this.dialogVisible = false;
+            this.getList();
+          })
       } else { // 新增操作
-        request({
-          url: '/role/addNewRole',
-          method: 'post',
-          data: this.role,
-        }, (response) => {
-          this.$message(
-            {
-              type: 'success',
-              message: '新增成功'
-            }
-          );
-          this.dialogVisible = false;
-          this.getList();
-        }, (failure) => {
-          console.log(failure);
-        })
+        addNewRole(this.role)
+          .then(response => {
+            this.$message.success("添加成功！");
+            this.dialogVisible = false;
+            this.getList();
+
+          })
       }
     },
     getAllPermissionList() {
-      request({
-        url: 'permission/getAllPermissions',
-        method: 'get',
-      }, (response => {
-        this.permissionList = response.data;
-      }), (failure) => {
-        console.log(failure);
-      })
+      getAllPermissions()
+        .then(response => {
+          this.permissionList = response;
+        })
     },
     handleDistributeDialogConfirm() {
-      request({
-        url: '/permission/addPermissionOfRole',
-        method: 'post',
-        data: {
-          'roleId': this.distributionRoleId,
-          'permissionIds': this.permissionIds
-        },
-      }, () => {
-        this.$message({
-          message: '分配成功！',
-          type: 'success'
-        });
-        this.distributionDialogVisible = false;
-      }, (failure) => {
-        console.log(failure);
-      })
+      addPermissionOfRole(this.distributionRoleId, this.permissionIds)
+        .then(response => {
+          this.$message.success("分配成功！")
+          this.distributionDialogVisible = false;
+        })
     }
   },
-
   created() {
     this.getList();
     this.getAllPermissionList();
-  },
+  }
 }
 </script>
 

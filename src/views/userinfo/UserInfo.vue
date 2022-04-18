@@ -13,13 +13,13 @@
       <br>
       <h3>密码修改</h3>
       <el-form-item label="当前密码" prop="oldPassword">
-        <el-input v-model="userInfoForm.oldPassword"></el-input>
+        <el-input v-model="userInfoForm.oldPassword"/>
       </el-form-item>
       <el-form-item label="新密码" prop="newPassword">
-        <el-input type="password" show-password v-model="userInfoForm.newPassword"></el-input>
+        <el-input type="password" show-password v-model="userInfoForm.newPassword"/>
       </el-form-item>
       <el-form-item label="确认密码" prop="checkNewPassword">
-        <el-input type="password" show-password v-model="userInfoForm.checkNewPassword"></el-input>
+        <el-input type="password" show-password v-model="userInfoForm.checkNewPassword"/>
       </el-form-item>
 
       <el-form-item>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {request} from "@/network/request";
+import {modifyPassword} from "@/api/userinfo";
 
 export default {
   name: "UserInfo",
@@ -57,8 +57,8 @@ export default {
       }
     };
     return {
-      username: sessionStorage.getItem('username'),
-      email: sessionStorage.getItem('email'),
+      username: JSON.parse(sessionStorage.userInfo).username,
+      email: JSON.parse(sessionStorage.userInfo).email,
       userInfoForm: {
         oldPassword: '',
         newPassword: '',
@@ -80,31 +80,19 @@ export default {
         if (!valid) {
           this.$message.error("按要求填写信息！")
         } else {
-          request({
-            url: '/user/modifyPassword',
-            method: 'post',
-            data: {
-              'username': this.username,
-              'oldPassword': this.userInfoForm.oldPassword,
-              'newPassword': this.userInfoForm.newPassword,
-            }
-          }, (response) => {
-            if (response.data.SystemStatusCode === 100000) {
-              this.$message.success("修改成功！")
-            } else {
-              this.$message.error("密码错误！")
-            }
-          }, (failure) => {
-            console.log(failure);
-            this.$message.error("网络错误！")
-          })
+          modifyPassword(this.username, this.userInfoForm.oldPassword, this.userInfoForm.newPassword)
+            .then(response => {
+              if (response.SystemStatusCode === 100000) {
+                this.$message.success("修改成功！")
+              } else {
+                this.$message.error("密码错误！")
+              }
+            })
         }
       });
     },
     resetForm() {
-      this.userInfoForm.oldPassword = '';
-      this.userInfoForm.newPassword = '';
-      this.userInfoForm.checkNewPassword = ''
+      this.$refs['userInfoForm'].resetFields();
     }
   }
 }

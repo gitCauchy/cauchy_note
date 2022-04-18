@@ -52,7 +52,7 @@
       </el-form>
       <h2 v-else style="text-align: center">用户不存在</h2>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleAddFriend()" size="small" v-show="isNull">添 加</el-button>
+        <el-button type="primary" @click="handleAddFriend" size="small" v-show="isNull">添 加</el-button>
         <el-button @click="handleCancel" size="small">关 闭</el-button>
       </span>
     </el-dialog>
@@ -87,7 +87,9 @@
 </template>
 
 <script>
-import {request} from "@/network/request";
+import {getFriendList, deleteFriend, searchFriend, addFriend} from "@/api/friend";
+import {getArticleList} from "@/api/article";
+import {addArticleShare} from "@/api/share";
 
 export default {
   name: "Friend",
@@ -109,7 +111,7 @@ export default {
       shareDialogVisible: false,
       queryInfo: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 5,
       },
       friendList: null,
       total: 0,
@@ -131,24 +133,13 @@ export default {
   },
   methods: {
     getArticleList() {
-      request({
-        url: '/article/getArticleList',
-        method: 'get',
-        params: {
-          "authorId": sessionStorage.getItem("user_id"),
-          "pageSize": 1000,
-          "pageNum": 1,
-          "keyword": ''
-        }
-      }, (response) => {
-
-        for (let i = 0; i < response.data.articles.length; i++) {
-          this.articleOptions.push({value: response.data.articles[i].id, label: response.data.articles[i].title})
-        }
-
-      }, (failure) => {
-        console.log(failure);
-      })
+      getArticleList(JSON.parse(sessionStorage.userInfo).id, 1000, 1, "")
+        .then(response => {
+            for (let i = 0; i < response.articles.length; i++) {
+              this.articleOptions.push({value: response.articles[i].id, label: response.articles[i].title})
+            }
+          }
+        )
     },
     handleShare(index, row) {
       this.shareDialogVisible = true;
@@ -156,21 +147,12 @@ export default {
     },
     getList() {
       this.listLoading = true;
-      request({
-        url: '/friend/getFriendList',
-        method: 'get',
-        params: {
-          "userId": sessionStorage.getItem("user_id"),
-          "pageSize": this.queryInfo.pageSize,
-          "pageNum": this.queryInfo.pageNum
-        }
-      }, (response) => {
-        this.listLoading = false;
-        this.friendList = response.data;
-        this.total = this.friendList.length;
-      }, (failure) => {
-        console.log(failure);
-      })
+      getFriendList(JSON.parse(sessionStorage.userInfo).id, this.queryInfo.pageSize, this.queryInfo.pageNum)
+        .then(response => {
+          this.listLoading = false;
+          this.friendList = response;
+          this.total = this.friendList.length;
+        })
     },
     handleSizeChange(value) {
       this.queryInfo.pageNum = 1;
@@ -184,22 +166,14 @@ export default {
     handleDelete(index, row) {
       this.$confirm('是否删除？', '提示',
         {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}).then(() => {
-          request({
-            url: '/friend/deleteFriend',
-            method: "get",
-            params: {
-              'userId': sessionStorage.getItem("user_id"),
-              'friendId': row.id
-            }
-          }, (response) => {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            });
-            this.getList()
-          }, (failure) => {
-            console.log(failure);
-          })
+          deleteFriend(JSON.parse(sessionStorage.userInfo).id, row.id)
+            .then(response => {
+              this.$message({
+                type: 'success',
+                message: '删除成功'
+              });
+              this.getList()
+            })
         }
       )
     },
@@ -208,79 +182,48 @@ export default {
     },
     searchFriend() {
       this.searchDialogVisible = true;
-      request({
-        url: '/friend/searchFriend',
-        method: 'get',
-        params: {
-          'friendName': this.friendName,
-        }
-      }, (response) => {
-        console.log(response.data);
-        this.searchResult = response.data;
-        if (this.searchResult.id != null) {
-          this.isNull = true;
-        }
-
-      }, (failure) => {
-        console.log(failure);
-      })
+      searchFriend(this.friendName)
+        .then(response => {
+          this.searchResult = response;
+          if (this.searchResult.id != null) {
+            this.isNull = true;
+          }
+        })
     },
     handleAddFriend() {
-      if (parseInt(sessionStorage.getItem("user_id")) === parseInt(this.searchResult.id)) {
+      if (parseInt(JSON.parse(sessionStorage.userInfo).id) === parseInt(this.searchResult.id)) {
         this.$message.error("不可添加自己为好友")
         this.searchDialogVisible = false;
       } else {
-        request({
-            url: '/friend/addFriend',
-            method: 'get',
-            params: {
-              'userId': sessionStorage.getItem("user_id"),
-              'friendId': this.searchResult.id
-            }
-          },
-          (response) => {
-            if (response.data === 100000) {
+        addFriend(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id)
+          .then(response => {
+            if (response === 100000) {
               this.$message.success("添加成功")
               this.searchDialogVisible = false;
               this.getList();
             } else {
               this.$message.error("添加失败")
             }
-          }, (failure) => {
-            console.log(failure);
-            this.$message.error("网络错误")
           })
       }
     },
     handleShareDialogConfirm() {
-      request({
-          url: '/share/addArticleShare',
-          method: 'post',
-          data: {
-            "shareUserId": sessionStorage.getItem("user_id"),
-            "receiveUserId": this.friend.id.toString(),
-            "articleId": this.articleSelectValue.toString(),
-            "validDay": this.validDaySelectValue,
-            "isRevisable": this.isRevisableSelectValue,
-          }
-        },
-        (repsponse) => {
-          if (repsponse.data === 100000) {
+      addArticleShare(JSON.parse(sessionStorage.userInfo).id,
+        this.friend.id,
+        this.articleSelectValue,
+        this.validDaySelectValue,
+        this.isRevisableSelectValue)
+        .then(response => {
+          if (response === 100000) {
             this.$message({
               message: '分享成功！',
               type: 'success'
             });
             this.shareDialogVisible = false;
           }
-
-        }, (failure) => {
-          console.log(failure);
-        }
-      )
+        })
     }
   },
-
-
 }
 </script>
 

@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import {request} from "@/network/request";
 
 export function login(username, password) {
   return request({
@@ -11,71 +11,36 @@ export function login(username, password) {
   })
 }
 
-// export function getInfo() {
-//   return request({
-//     url: '/admin/info',
-//     method: 'get',
-//   })
-// }
-
-export function logout() {
+export function register(username, password, email) {
   return request({
-    url: '/admin/logout',
-    method: 'post'
-  })
-}
-
-export function fetchList() {
-  console.log('hhhhh');
-  return request({
-    url: 'http://localhost:8080/user/queryAllUsers',
-    method: 'get'
-  })
-}
-
-export function createAdmin(data) {
-  return request({
-    url: '/admin/register',
+    url: '/register',
     method: 'post',
-    data: data
+    data: {
+      username,
+      password,
+      email
+    }
   })
 }
 
-export function updateAdmin(id, data) {
+export function sendCheckCode(username) {
   return request({
-    url: '/admin/update/' + id,
-    method: 'post',
-    data: data
-  })
-}
-
-export function updateStatus(id, params) {
-  return request({
-    url: '/admin/updateStatus/' + id,
-    method: 'post',
-    params: params
-  })
-}
-
-export function deleteAdmin(id) {
-  return request({
-    url: 'localhost:8080/user/deleteUser',
+    url: '/user/sendCheckCode',
     method: 'get',
-    params: id
+    params: {
+      username
+    }
   })
 }
 
-export function getRoleByAdmin(id) {
+export function resetPassword(username,newPassword,checkCode){
   return request({
-    url: '/admin/role/' + id,
-    method: 'get'
-  })
-}
-
-export function allocRole(data) {
-  return request({
-    url: '/admin/role/update',
-    method: 'post',
-    data: data
+    url:'/user/resetPassword',
+    method:'post',
+    data:{
+      username,
+      newPassword,
+      checkCode
+    }
   })
 }

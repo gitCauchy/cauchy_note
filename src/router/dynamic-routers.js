@@ -1,18 +1,18 @@
 const userRule = {
   path: '/user',
   name: 'user',
-  component: () => import ('../views/user/User')
+  component: () => import ('../views/admin/User')
 }
 
 const roleRule = {
   path: '/role',
   name: 'role',
-  component: () => import ('../views/role/Role')
+  component: () => import ('../views/admin/Role')
 }
 const permissionRule = {
   path: '/permission',
   name: 'permission',
-  component: () => import('../views/permission/Permission')
+  component: () => import('../views/admin/Permission')
 }
 
 const menuRule = {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import {Message} from "element-ui";
 
 export function request(config, success, failure) {
   // 创建 axios 实例
@@ -6,13 +7,14 @@ export function request(config, success, failure) {
     baseURL: 'http://127.0.0.1:8090',
     timeout: 5000
   })
-
-  // 发送网络请求
-  instance(config, success, failure)
-    .then(res => {
-      success(res);
+  instance.interceptors.response.use(response => {
+    return response.data;
+  }, error => {
+    console.log(error);
+    Message({
+      message: '网络错误！',
+      type: 'error'
     })
-    .catch(err => {
-      failure(err);
-    })
+  })
+  return instance(config);
 }

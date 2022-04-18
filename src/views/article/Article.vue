@@ -12,7 +12,7 @@
     <el-form class="operation-container" shadow="never">
       <i class="el-icon-tickets"/>
       <span>笔记列表</span>
-      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd()" style="margin:20px">添加</el-button>
+      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd" style="margin:20px">添加</el-button>
     </el-form>
     <div class="data-container">
       <el-table ref="userTable" :data="articleList" v-loading="listLoading" style="width:100%" border stripe>
@@ -93,7 +93,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCancel" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleShareDialogConfirm()" size="small">分 享</el-button>
+        <el-button type="primary" @click="handleShareDialogConfirm" size="small">分 享</el-button>
       </span>
     </el-dialog>
 
@@ -101,8 +101,11 @@
 </template>
 
 <script>
-import {request} from "@/network/request";
+import {deleteArticle, modifyArticle, addArticle, getArticleList} from "@/api/article";
+import {addArticleShare} from "@/api/share";
+import {getFriendList} from "@/api/friend";
 import TinymceEditor from "@/components/tinymce-editor";
+
 
 export default {
   name: "articleList",
@@ -164,60 +167,47 @@ export default {
       this.getList();
     },
     getFriendList() {
-      request({
-        url: '/friend/getFriendList',
-        method: 'get',
-        params: {
-          "userId": sessionStorage.getItem("user_id")
-        }
-      }, (response) => {
-        for (let i = 0; i < response.data.length; i++) {
-          this.friendOptions.push({value: response.data[i].id, label: response.data[i].username})
-        }
-      }, (failure) => {
-        console.log(failure);
-      })
+      getFriendList(
+        JSON.parse(sessionStorage.userInfo).id,
+        1000,
+        1
+      )
+        .then(response => {
+          for (let i = 0; i < response.length; i++) {
+            this.friendOptions.push({value: response[i].id, label: response[i].username})
+          }
+        })
+
     },
     getList() {
       this.listLoading = true;
-      request({
-        url: '/article/getArticleList',
-        method: 'get',
-        params: {
-          "authorId": sessionStorage.getItem("user_id"),
-          "pageSize": this.queryInfo.pageSize,
-          "pageNum": this.queryInfo.pageNum,
-          "keyword": this.queryInfo.searchWord
-        }
-      }, (response) => {
-        this.listLoading = false;
-        this.articleList = response.data.articles;
-        this.total = response.data.total;
-      }, (failure) => {
-        console.log(failure);
-      })
+      getArticleList(
+        JSON.parse(sessionStorage.userInfo).id,
+        this.queryInfo.pageSize,
+        this.queryInfo.pageNum,
+        this.queryInfo.searchWord)
+        .then(response => {
+          this.listLoading = false;
+          this.articleList = response.articles;
+          this.total = response.total;
+        })
     },
 
     handleDelete(index, row) {
       this.$confirm('是否删除？', '提示',
-        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}).then(() => {
-          request({
-            url: '/article/deleteArticle',
-            method: "get",
-            params: {
-              'id': row.id
-            }
-          }, (response) => {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            });
-            this.getList()
-          }, (failure) => {
-            console.log(failure);
-          })
-        }
-      )
+        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'})
+        .then(() => {
+            deleteArticle(row.id)
+              .then(response => {
+                if (response === true) {
+                  this.$message.success("删除成功！")
+                  this.getList()
+                } else {
+                  this.$message.error("删除失败")
+                }
+              })
+          }
+        )
     },
     handleUpdate(index, row) {
       this.dialogVisible = true;
@@ -226,35 +216,29 @@ export default {
     },
     handleDialogConfirm() {
       if (this.isEdit) {
-        request({
-          url: '/article/modifyArticle',
-          method: 'post',
-          data: this.article
-        }, (response) => {
-          this.$message({
-            message: '修改成功！',
-            type: 'success'
-          });
-          this.dialogVisible = false;
-          this.getList();
-        }, failure => {
-          console.log(failure);
-        })
+        modifyArticle(this.article.id, this.article.title, this.article.content)
+          .then(response => {
+            if (response === true) {
+              this.$message.success("修改成功");
+              this.dialogVisible = false;
+              this.getList();
+            } else {
+              this.$message.error("修改失败")
+              this.dialogVisible = false;
+            }
+          })
       } else { // 如果是新增窗口
-        request({
-          url: '/article/addArticle',
-          method: 'post',
-          data: this.article
-        }, (response) => {
-          this.$message({
-            message: '添加成功！',
-            type: 'success'
-          });
-          this.dialogVisible = false;
-          this.getList();
-        }, (failure) => {
-          console.log(failure);
-        })
+        addArticle(this.article.title, this.article.content, JSON.parse(sessionStorage.userInfo).id)
+          .then(response => {
+            if (response === true) {
+              this.$message.success("添加成功！");
+              this.dialogVisible = false;
+              this.getList();
+            } else {
+              this.$message.error("添加失败！");
+              this.dialogVisible = false;
+            }
+          })
       }
       this.$router.go(0)
     },
@@ -263,7 +247,7 @@ export default {
       this.$router.go(0);
     },
     handleAdd() {
-      this.article = Object.assign({}, defaultArticle)
+      this.article = {}
       this.dialogVisible = true;
       this.isEdit = false;
     },
@@ -280,32 +264,17 @@ export default {
       this.shareDialogVisible = true;
     },
     handleShareDialogConfirm() {
-
-      request({
-          url: '/share/addArticleShare',
-          method: 'post',
-          data: {
-            "shareUserId": sessionStorage.getItem("user_id"),
-            "receiveUserId": this.friendSelectValue.toString(),
-            "articleId": this.article.id.toString(),
-            "validDay": this.validDaySelectValue,
-            "isRevisable":
-            this.isRevisableSelectValue,
-          }
-        },
-        (repsponse) => {
-          if (repsponse.data === 100000) {
+      addArticleShare(sessionStorage.getItem("userInfo").id, this.friendSelectValue, this.article.id,
+        this.validDaySelectValue, this.isRevisableSelectValue)
+        .then(response => {
+          if (response === 100000) {
             this.$message({
               message: '分享成功！',
               type: 'success'
             });
             this.shareDialogVisible = false;
           }
-
-        }, (failure) => {
-          console.log(failure);
-        }
-      )
+        })
     }
   }
 }

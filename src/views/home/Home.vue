@@ -6,7 +6,6 @@
           <img src="../../assets/img/user.jpg" alt="用户头像"/>
           <div class="userinfo">
             <p class="name">{{ username }}</p>
-            <p class="access">{{ userRole }}</p>
           </div>
         </div>
         <div class="login-info">
@@ -49,18 +48,15 @@
 
 <script>
 import * as echars from 'echarts'
-import {request} from "@/network/request";
-import {formatDate} from "@/utils/date";
-import {formatTime} from "@/utils/date";
+import {formatDate, formatTime} from "@/utils/date";
+import {getTableData, getCountData, getTrendData} from "@/api/home";
 
 export default {
   name: "Home",
   data() {
     return {
       date: new Date(),
-      userId: sessionStorage.getItem("user_id"),
-      username: sessionStorage.getItem("username"),
-      userRole: sessionStorage.getItem("userRole"),
+      username: JSON.parse(sessionStorage.userInfo).username,
       tableData: null,
       tableLabel: {
         name: '用户',
@@ -111,7 +107,7 @@ export default {
   },
   filters: {
     formatDate: formatDate,
-    formatTime:formatTime
+    formatTime: formatTime
   },
   created() {
     const current = new Date()
@@ -122,63 +118,47 @@ export default {
     this.timer = setInterval(() => {
       _this.date = new Date(); // 修改数据date
     }, 1000)
-    request({
-      url: '/article/getCountData',
-      method: 'get',
-      params: {
-        "authorId": this.userId
-      }
-    }, (response) => {
-      this.countData[0].value = response.data.userLoginData.countOfWeek;
-      this.countData[1].value = response.data.userLoginData.countOfMonth;
-      this.countData[2].value = response.data.userLoginData.countOfYear;
-      this.countData[3].value = response.data.userArticleData.countOfWeek;
-      this.countData[4].value = response.data.userArticleData.countOfMonth;
-      this.countData[5].value = response.data.userArticleData.countOfYear;
-    }, (failure) => {
-      console.log(failure);
-    })
-    request({
-      url: '/article/getTableData',
-      method: 'get',
-    }, (response) => {
-      //console.log(response.data);
-      this.tableData = response.data
-    }, (failure) => {
-      console.log(failure);
-    })
-    request({
-      url: '/article/getTrendData',
-      method: 'get',
-    }, (response) => {
-      this.trendData = response.data
-      const datas = this.trendData
-      const xData = datas.dates
-      const keyArray = Object.keys(datas.data[0])
-      const series = []
-      keyArray.forEach(key => {
-        series.push({
-          name: key,
-          data: datas.data.map(item => item[key]),
-          type: 'line'
-        })
+    getCountData(JSON.parse(sessionStorage.userInfo).id)
+      .then(response => {
+        this.countData[0].value = response.userLoginData.countOfWeek;
+        this.countData[1].value = response.userLoginData.countOfMonth;
+        this.countData[2].value = response.userLoginData.countOfYear;
+        this.countData[3].value = response.userArticleData.countOfWeek;
+        this.countData[4].value = response.userArticleData.countOfMonth;
+        this.countData[5].value = response.userArticleData.countOfYear;
       })
+    getTableData()
+      .then(response => {
+        this.tableData = response
+      })
+    getTrendData()
+      .then(response => {
+        this.trendData = response
+        const datas = this.trendData
+        const xData = datas.dates
+        const keyArray = Object.keys(datas.data[0])
+        const series = []
+        keyArray.forEach(key => {
+          series.push({
+            name: key,
+            data: datas.data.map(item => item[key]),
+            type: 'line'
+          })
+        })
 
-      const option = {
-        xAxis: {
-          data: xData
-        },
-        yAxis: {},
-        legend: {
-          data: keyArray
-        },
-        series
-      }
-      const E = echars.init(this.$refs.echarts)
-      E.setOption(option)
-    }, (failure) => {
-      console.log(failure);
-    })
+        const option = {
+          xAxis: {
+            data: xData
+          },
+          yAxis: {},
+          legend: {
+            data: keyArray
+          },
+          series
+        }
+        const E = echars.init(this.$refs.echarts)
+        E.setOption(option)
+      })
   },
   methods: {
     getTime() {

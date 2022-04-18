@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {request} from "../../network/request";
+import {getAllMenus} from "@/api/admin";
 
 export default {
   name: "Menu",
@@ -25,15 +25,10 @@ export default {
   },
   methods: {
     getMenuList() {
-      request({
-        url: '/menu/getAllMenus',
-        method: 'get'
-      }, (response) => {
-        this.menuList = response.data;
-        console.log(this.menuList);
-      }, (failure) => {
-        this.$message.error("获取失败！")
-      })
+      getAllMenus()
+        .then(response => {
+          this.menuList = response;
+        })
     }
   }
 }

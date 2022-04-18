@@ -12,12 +12,14 @@
             <el-input v-model="registerForm.email" placeholder="请输入邮箱" prefix-icon="el-icon-message"></el-input>
           </el-form-item>
           <el-form-item prop="password" label="密码：" class="form_password">
-            <el-input v-model="registerForm.password" show-password placeholder="请输入密码"
+            <el-input v-model="registerForm.password" @keyup.enter.native="doRegister" show-password placeholder="请输入密码"
                       prefix-icon="el-icon-lock"></el-input>
           </el-form-item>
           <el-row>
-            <el-button type="primary" @click="doRegister()" style="float:left" size="small">注册账号</el-button>
-            <el-button type="primary" @click="goToLink('/login')" style="float:right" size="small">登录账号
+            <el-button type="primary" @click="doRegister" style="float:left"
+                       size="small">注册账号
+            </el-button>
+            <el-button type="primary" @click="doLogin" style="float:right" size="small">登录账号
             </el-button>
           </el-row>
         </el-form>
@@ -27,7 +29,8 @@
 </template>
 
 <script>
-import {request} from "@/network/request";
+import {goToLink} from "@/utils/public";
+import {register} from "@/api/login";
 
 export default {
   name: "login",
@@ -66,28 +69,23 @@ export default {
     };
   },
   methods: {
-    goToLink(link) {
-      this.$router.replace(link)
+    doLogin() {
+      goToLink('/login')
     },
     doRegister() {
       this.$refs['registerForm'].validate((valid) => {
         if (!valid) {
           this.$message.error("输入内容不合法！")
         } else {
-          request({
-            url: '/register',
-            method: 'post',
-            data: this.registerForm
-          }, (response) => {
-            if (response.data === 100000) {
-              this.$message.success("注册成功！跳转至登录页面... ...")
-              this.$router.push('/login')
-            } else if (response.data === -300000) {
-              this.$message.error("用户已存在！")
-            }
-          }, () => {
-            console.log('failure');
-          })
+          register(this.registerForm.username, this.registerForm.password, this.registerForm.email)
+            .then(response => {
+              if (response === 100000) {
+                this.$message.success("注册成功！跳转至登录页面... ...")
+                this.$router.push('/login')
+              } else if (response === -300000) {
+                this.$message.error("用户已存在！")
+              }
+            })
         }
       })
     }

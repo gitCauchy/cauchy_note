@@ -21,7 +21,8 @@
         </el-form-item>
 
         <el-form-item label="确认密码" prop="checkPassword">
-          <el-input type="password" show-password v-model="resetPasswordForm.checkPassword" autocomplete="off"></el-input>
+          <el-input type="password" show-password v-model="resetPasswordForm.checkPassword"
+                    autocomplete="off"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -33,13 +34,13 @@
 </template>
 
 <script>
-import {request} from "@/network/request";
+import {sendCheckCode, resetPassword} from "@/api/login";
 
 export default {
   name: "ResetPassword",
   data() {
     const validateCheckCode = (rule, value, callback) => {
-      if(value.length !== 6){
+      if (value.length !== 6) {
         callback(new Error('验证码长度错误'))
       }
       callback();
@@ -101,49 +102,30 @@ export default {
           this.isDisabled = true
           this.getCode = this.count-- + 's后重发'
         }
-      },1000)
-      request({
-        url: '/user/sendCheckCode',
-        method: 'get',
-        params: {
-          'username': this.resetPasswordForm.username
-        }
-      }, (response) => {
-        if (response.data.SystemStatusCode === 100000) {
-          this.$message.success("验证码发送成功！")
+      }, 1000)
+      sendCheckCode(this.resetPasswordForm.username)
+        .then(response => {
+          if (response.SystemStatusCode === 100000) {
+            this.$message.success("验证码发送成功！")
 
-        } else {
-          this.$message.error("系统异常，请稍后再试！")
-        }
-      }, (failure) => {
-        console.log(failure);
-        this.$message.error("网络异常")
-      })
+          } else {
+            this.$message.error("系统异常，请稍后再试！")
+          }
+        })
     },
     resetPassword() {
       this.$refs['resetPasswordForm'].validate((valid) => {
         if (!valid) {
           this.$message.error("填写有误")
         } else {
-          console.log(valid);
-          request({
-            url: '/user/resetPassword',
-            method: 'post',
-            data: {
-              'username': this.resetPasswordForm.username,
-              'newPassword': this.resetPasswordForm.password,
-              'checkCode': this.resetPasswordForm.checkCode
-            }
-          }, (response) => {
-            if (response.data.SystemStatusCode === 100000) {
-              this.$message.success("修改成功！")
-            } else {
-              this.$message.error("验证码错误！")
-            }
-          }, (failure) => {
-            console.log(failure);
-            this.$message.error("网络错误！")
-          })
+          resetPassword(this.resetPasswordForm.username, this.resetPasswordForm.password, this.resetPasswordForm.checkCode)
+            .then(response => {
+              if (response.SystemStatusCode === 100000) {
+                this.$message.success("修改成功！")
+              } else {
+                this.$message.error("验证码错误！")
+              }
+            })
         }
       })
     }

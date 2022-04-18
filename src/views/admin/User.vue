@@ -3,8 +3,8 @@
     <el-card class="search-container" shadow="never">
       <el-row>
         <el-col :span="15">
-          <el-input placeholder="用户名" v-model="queryInfo.searchWord" clearable>
-            <el-button slot="append" icon="el-icon-search" @click="handleSearchList()"></el-button>
+          <el-input placeholder="用户名" @keyup.enter.native="handleSearchList" v-model="queryInfo.searchWord" clearable>
+            <el-button slot="append" icon="el-icon-search" @click="handleSearchList"/>
           </el-input>
         </el-col>
       </el-row>
@@ -16,8 +16,8 @@
     </el-form>
     <div class="data-container">
       <el-table ref="userTable" :data="userList" v-loading="listLoading" style="width:100%" border stripe>
-        <el-table-column label="#" align="center" type="index"></el-table-column>
-        <el-table-column label="用户名" width="200" align="center">
+        <el-table-column label="#" align="center" type="index"/>
+        <el-table-column label="用户名" align="center">
           <template slot-scope="scope">{{ scope.row.username }}</template>
         </el-table-column>
         <el-table-column label="邮箱" align="center">
@@ -37,15 +37,15 @@
             <el-button-group>
               <el-tooltip effect="dark" content="编辑用户" placement="top">
                 <el-button type="primary" icon="el-icon-edit"
-                           @click="handleUpdate(scope.$index,scope.row)"></el-button>
+                           @click="handleUpdate(scope.$index,scope.row)"/>
               </el-tooltip>
               <el-tooltip effect="dark" content="分配角色" placement="top">
                 <el-button type="warning" icon="el-icon-setting"
-                           @click="handleSelectRole(scope.$index,scope.row)"></el-button>
+                           @click="handleSelectRole(scope.$index,scope.row)"/>
               </el-tooltip>
               <el-tooltip effect="dark" content="删除用户" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
-                           @click="handleDelete(scope.$index, scope.row)"></el-button>
+                           @click="handleDelete(scope.$index, scope.row)"/>
               </el-tooltip>
             </el-button-group>
           </template>
@@ -63,15 +63,15 @@
       :total="total">
     </el-pagination>
     <el-dialog :title="isEdit?'编辑用户':'添加用户'" :visible.sync="dialogVisible" width="40%">
-      <el-form :model="user" ref="adminForm" label-width="150px" size="small">
-        <el-form-item label="用户名：">
+      <el-form :model="user" ref="user" label-width="150px" size="small" :rules="rules">
+        <el-form-item prop="username" label="用户名：">
           <el-input v-model="user.username" style="width: 250px"/>
         </el-form-item>
-        <el-form-item label="邮箱：">
+        <el-form-item prop="email" label="邮箱：">
           <el-input v-model="user.email" style="width: 250px"/>
         </el-form-item>
-        <el-form-item label="密码：">
-          <el-input v-model="user.password" style="width: 250px"/>
+        <el-form-item prop="password" label="密码：">
+          <el-input type="password" show-password v-model="user.password" style="width: 250px"/>
         </el-form-item>
         <el-form-item label="是否有效">
           <el-radio-group v-model="user.isEnable">
@@ -94,45 +94,67 @@
       </el-select>
       <span slot="footer" class="dialog-footer">
         <el-button @click="distributionDialogVisible=false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDistributeDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" @click="handleDistributeDialogConfirm" size="small">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {request} from "../../network/request";
-
-const defaultQueryInfo = {
-  pageNum: 1,
-  pageSize: 10,
-  searchWord: ""
-};
-
-const defaultUser = {
-  id: null,
-  username: null,
-  password: null,
-  email: null,
-  createTime: null,
-  isEnable: null
-}
+import {
+  addRoleOfUser,
+  addUser,
+  deleteUser,
+  findRoleByUserId,
+  getAllRoles,
+  queryAllUsers,
+  updateUser
+} from "@/api/admin";
 
 export default {
   name: "userList",
   data() {
+    const validUsername = (rule, value, callback) => {
+      if (value) {
+        if (/[\u4E00-\u9FA5]/g.test(value)) {
+          callback(new Error("字母，数字，英文符号组成，不可为汉字"));
+        }
+        callback();
+      }
+    };
+
+    const validEmail = (rule, value, callback) => {
+      if (value) {
+        if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
+          callback(new Error("邮箱格式错误"));
+        }
+        callback();
+      }
+    }
     return {
-      queryInfo: Object.assign({}, defaultQueryInfo),
+      queryInfo: {
+        pageNum: 1,
+        pageSize: 10,
+        searchWord: ""
+      },
       userList: null,
       total: null,
       listLoading: false,
       dialogVisible: false,
       isEdit: false,
-      user: Object.assign({}, defaultUser),
+      user: {},
       distributionUserId: null,
       distributionDialogVisible: false,
       roleIds: [],
       roleList: [],
+      rules: {
+        username: [
+          {validator: validUsername, trigger: 'blur'},
+          {min: 6, max: 14, message: '长度在6-14字符之间', trigger: "blur"}
+        ],
+        email: [{validator: validEmail, trigger: 'blur'}],
+        password: [{min: 6, max: 14, message: '长度在6-16字符之间', trigger: "blur"}]
+      }
     }
   },
   created() {
@@ -151,56 +173,28 @@ export default {
     },
     getList() {
       this.listLoading = true;
-      request({
-        url: '/user/queryAllUsers',
-        method: 'get',
-        params: {
-          "pageSize": this.queryInfo.pageSize,
-          "pageNum": this.queryInfo.pageNum,
-          "keyword": this.queryInfo.searchWord
-        }
-      }, (response) => {
-        this.listLoading = false;
-        this.userList = response.data.users;
-        this.total = response.data.total;
-      }, (failure) => {
-        console.log(failure);
-      })
+      queryAllUsers(this.queryInfo.pageSize, this.queryInfo.pageNum, this.queryInfo.searchWord)
+        .then(response => {
+          this.listLoading = false;
+          this.userList = response.users;
+          this.total = response.total;
+        })
     },
     getAllRoleList() {
-      request({
-        url: 'role/getAllRoles',
-        method: 'get',
-        params: {
-          'pageSize': 100,
-          'pageNum': 1,
-          'keyword': ''
-        }
-      }, (response => {
-        this.roleList = response.data.roles;
-      }), (failure) => {
-        console.log(failure);
-      })
+      getAllRoles(1, 100, '')
+        .then(response => {
+          this.roleList = response.roles;
+        })
 
     },
     handleDelete(index, row) {
       this.$confirm('是否删除该用户？', '提示',
         {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}).then(() => {
-          request({
-            url: '/user/deleteUser',
-            method: "get",
-            params: {
-              'id': row.id
-            }
-          }, (response) => {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            });
-            this.getList()
-          }, (failure) => {
-            console.log(failure);
-          })
+          deleteUser(row.id)
+            .then(response => {
+              this.$message.success("删除成功！")
+              this.getList();
+            })
         }
       )
     },
@@ -210,40 +204,32 @@ export default {
       this.user = Object.assign({}, row)
     },
     handleDialogConfirm() {
-      if (this.isEdit) { // 如果是编辑窗口
-        request({
-          url: '/user/updateUser',
-          method: 'post',
-          data: this.user
-        }, (response) => {
-          this.$message({
-            message: '修改成功！',
-            type: 'success'
-          });
-          this.dialogVisible = false;
-          this.getList();
-        })
-      } else { // 如果是新增窗口
-        request({
-          url: '/user/addUser',
-          method: 'post',
-          data: this.user
-        }, (response) => {
-          this.$message({
-            message: '添加成功！',
-            type: 'success'
-          });
-          this.dialogVisible = false;
-          this.getList();
-        }, (failure) => {
-          console.log(failure);
-        })
-      }
+      this.$refs['user'].validate((valid) => {
+        if (!valid) {
+          this.$message.error("输入内容不合法！")
+        } else {
+          if (this.isEdit) { // 如果是编辑窗口
+            updateUser(this.user)
+              .then(response => {
+                this.$message.success("修改成功！");
+                this.dialogVisible = false;
+                this.getList();
+              })
+          } else { // 如果是新增窗口
+            addUser(this.user)
+              .then(response => {
+                this.$message.success("添加成功！");
+                this.dialogVisible = false;
+                this.getList();
+              })
+          }
+        }
+      })
     },
     handleAdd() {
       this.dialogVisible = true;
       this.isEdit = false;
-      this.user = Object.assign({}, defaultUser)
+      this.user = {};
     },
     handleSelectRole(index, row) {
       this.distributionUserId = row.id;
@@ -251,48 +237,28 @@ export default {
       this.getRoleListByUserId(row.id);
     },
     getRoleListByUserId(userId) {
-      request({
-        url: '/role/findRoleByUserId',
-        method: 'get',
-        params: {
-          'id': userId
-        }
-      }, (response) => {
-        let reqRoleList = response.data;
-        this.roleIds = [];
-        if (reqRoleList != null && reqRoleList.length > 0) {
-          for (let i = 0; i < reqRoleList.length; i++) {
-            this.roleIds.push(reqRoleList[i].id)
+      findRoleByUserId(userId)
+        .then(response => {
+          let reqRoleList = response;
+          this.roleIds = [];
+          if (reqRoleList != null && reqRoleList.length > 0) {
+            for (let i = 0; i < reqRoleList.length; i++) {
+              this.roleIds.push(reqRoleList[i].id)
+            }
           }
-        }
-      }, (failure) => {
-        console.log(failure);
-      })
+        })
     },
     handleSearchList() {
       this.queryInfo.pageNum = 1;
       this.getList();
     },
-    handleSearchReset() {
-      this.queryInfo = Object.assign({}, defaultQueryInfo)
-    },
+
     handleDistributeDialogConfirm() {
-      request({
-        url: '/role/addRoleOfUser',
-        method: 'post',
-        data: {
-          'userId': this.distributionUserId,
-          'roleIds': this.roleIds
-        },
-      }, () => {
-        this.$message({
-          message: '分配成功！',
-          type: 'success'
-        });
-        this.distributionDialogVisible = false;
-      }, (failure) => {
-        console.log(failure);
-      })
+      addRoleOfUser(this.distributionUserId, this.roleIds)
+        .then(response => {
+          this.$message.success("分配成功！");
+          this.distributionDialogVisible = false;
+        })
     }
   }
 }
