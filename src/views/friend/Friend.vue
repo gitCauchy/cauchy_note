@@ -3,7 +3,7 @@
     <el-card class="search-container" shadow="never" style="margin-bottom: 20px">
       <el-row>
         <el-col :span="15">
-          <el-input placeholder="搜索用户名添加好友" v-model="friendName" clearable>
+          <el-input placeholder="搜索用户名添加好友" v-model="friendName" @keyup.enter.native="searchFriend" clearable>
             <el-button slot="append" icon="el-icon-search" @click="searchFriend"></el-button>
           </el-input>
         </el-col>
@@ -12,7 +12,7 @@
     <div class="data-container">
       <el-table ref="userTable" :data="friendList" v-loading="listLoading" style="width:100%" border stripe>
         <el-table-column label="#" align="center" type="index"></el-table-column>
-        <el-table-column label="用户名" align="center">
+        <el-table-column label="好友" align="center">
           <template slot-scope="scope">{{ scope.row.username }}</template>
         </el-table-column>
         <el-table-column label="邮箱" align="center">
@@ -43,7 +43,7 @@
     </el-pagination>
     <el-dialog title="搜索结果" :visible.sync="searchDialogVisible" :fullscreen=false width="30%">
       <el-form label-position="right" v-if="isNull">
-        <el-form-item label="用户名：">
+        <el-form-item label="用户：">
           <el-input v-model="searchResult.username" style="width: 75%" readonly></el-input>
         </el-form-item>
         <el-form-item label="邮箱：">

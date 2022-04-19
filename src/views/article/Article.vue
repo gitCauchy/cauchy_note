@@ -3,8 +3,8 @@
     <el-card class="search-container" shadow="never">
       <el-row>
         <el-col :span="15">
-          <el-input placeholder="标题" v-model="queryInfo.searchWord" clearable>
-            <el-button slot="append" icon="el-icon-search" @click="handleSearchList()"></el-button>
+          <el-input placeholder="标题" v-model="queryInfo.searchWord" @keyup.enter.native="handleSearchList"clearable>
+            <el-button slot="append" icon="el-icon-search" @click="handleSearchList"></el-button>
           </el-input>
         </el-col>
       </el-row>
@@ -199,7 +199,7 @@ export default {
         .then(() => {
             deleteArticle(row.id)
               .then(response => {
-                if (response === true) {
+                if (response === 100000) {
                   this.$message.success("删除成功！")
                   this.getList()
                 } else {
@@ -255,9 +255,6 @@ export default {
     handleSearchList() {
       this.queryInfo.pageNum = 1;
       this.getList();
-    },
-    handleSearchReset() {
-      this.queryInfo = Object.assign({}, defaultQueryInfo)
     },
     handleShare(index, row) {
       this.article = Object.assign({}, row);

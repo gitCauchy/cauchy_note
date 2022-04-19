@@ -3,7 +3,7 @@
     <el-card class="search-container" shadow="never" style="margin-bottom: 20px">
       <el-row>
         <el-col :span="15">
-          <el-input placeholder="标题" v-model="queryInfo.searchWord" clearable>
+          <el-input placeholder="标题" v-model="queryInfo.searchWord" @keyup.enter.native="handleSearchList" clearable>
             <el-button slot="append" icon="el-icon-search" @click="handleSearchList"></el-button>
           </el-input>
         </el-col>
