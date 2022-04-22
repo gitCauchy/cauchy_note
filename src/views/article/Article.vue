@@ -56,13 +56,15 @@
       :page-sizes="[10,15,20]"
       :total="total">
     </el-pagination>
-    <el-dialog :title="isEdit?'编辑':'添加'" :visible.sync="dialogVisible" :fullscreen=true>
+    <el-dialog :title="isEdit?'编辑':'添加'" :visible.sync="dialogVisible"
+               :fullscreen=true
+               @close="closeDialog">
       <el-form :model="article" ref="articleForm" label-width="100px">
         <el-form-item>
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <WangEditor :parent-content="article.content" @input="handleTinymceInput"
+          <WangEditor ref="textEditor" :parent-content="article.content" @input="handleTinymceInput"
                       style="width: 85%"></WangEditor>
         </el-form-item>
       </el-form>
@@ -193,6 +195,9 @@ export default {
           this.total = response.total;
         })
     },
+    closeDialog() {
+      this.$refs.textEditor.editor.clear();
+    },
 
     handleDelete(index, row) {
       this.$confirm('是否删除？', '提示',
@@ -241,11 +246,9 @@ export default {
             }
           })
       }
-      this.$router.go(0)
     },
     handleCancel() {
       this.dialogVisible = false;
-      this.$router.go(0);
     },
     handleAdd() {
       this.article = {}

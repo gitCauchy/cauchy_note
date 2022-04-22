@@ -3,11 +3,10 @@ import VueRouter from 'vue-router'
 import Login from "../views/login/Login";
 import Register from "../views/login/Register";
 import ResetPassword from "../views/login/ResetPassword";
-import NotFound from "../components/NotFound"
 import Main from "../views/Main";
 import store from '../store'
 import {ruleMapping} from "./dynamic-routers";
-import {request} from "@/network/request";
+import {checkToken} from "@/api/login";
 
 const originPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -50,9 +49,7 @@ const routes = [
   },
   {
     path: '*',
-    redirect: {
-      component: NotFound
-    }
+    component: () => import('../components/NotFound')
   }
 ]
 
@@ -66,24 +63,19 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/login' || to.path === '/register' || to.path === '/resetPassword') {
     next()
   } else {
-    const token = sessionStorage.getItem("token")
-    const username = sessionStorage.getItem("username")
+    const token = sessionStorage.token
+    const username = JSON.parse(sessionStorage.userInfo).username
     if (!token) {
       next({path: '/login'})
     } else {
-      request({
-        url: '/checkToken',
-        method: 'get',
-        headers: {
-          "token": token,
-          "username": username
-        }
-      }, (response) => {
-        if (!response.data) {
-          // token 校验失败
-          next({path: '/login'})
-        }
-      })
+      checkToken(token, username)
+        .then(response => {
+          if (!response) {
+            next({path: '/login'})
+          }else {
+            next(to);
+          }
+        })
       next();
     }
   }

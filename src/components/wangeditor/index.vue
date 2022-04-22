@@ -26,32 +26,48 @@ export default {
   components: {Editor, Toolbar},
   data() {
     return {
+      readOnly: !this.canEditor,
       editor: '',
       html: this.parentContent,
       toolbarConfig: {
-        toolbarKeys: ["bold","underline","italic","through","code","clearStyle","headerSelect","header1","header2","header3",
-          "color","bgColor","insertLink","editLink","unLink","viewLink", "blockquote","emotion","fontSize","fontFamily",
-          "indent","delIndent","justifyLeft","justifyRight","justifyCenter","lineHeight","redo","undo","divider","codeBlock",
-          "bulletedList","numberedList","insertTable","deleteTable","insertTableRow","deleteTableRow","insertTableCol",
-          "deleteTableCol","tableHeader","tableFullWidth","uploadImage","codeSelectLang"],
+        toolbarKeys: ["bold", "underline", "italic", "through", "code", "clearStyle", "headerSelect", "header1", "header2", "header3",
+          "color", "bgColor", "insertLink", "editLink", "unLink", "viewLink", "blockquote", "emotion", "fontSize", "fontFamily",
+          "indent", "delIndent", "justifyLeft", "justifyRight", "justifyCenter", "lineHeight", "redo", "undo", "divider", "codeBlock",
+          "bulletedList", "numberedList", "insertTable", "deleteTable", "insertTableRow", "deleteTableRow", "insertTableCol",
+          "deleteTableCol", "tableHeader", "tableFullWidth", "uploadImage", "codeSelectLang"],
       },
       editorConfig: {
         placeholder: '请输入内容...',
         // autoFocus: false,
         // 所有的菜单配置，都要在 MENU_CONF 属性下
-        MENU_CONF: {}
+        MENU_CONF: {},
+        readOnly: this.readOnly
       }
     }
   },
   props: {
+    canEditor: {
+      type: Boolean,
+      default: false,
+    },
     parentContent: {
       type: String,
       default: '',
     },
   },
+  watch: {
+    canEditor(){
+      this.readOnly = !this.canEditor;
+    },
+    parentContent() {
+      this.html = this.parentContent;
+    }
+  },
   methods: {
     onCreated(editor) {
       this.editor = Object.seal(editor) // 【注意】一定要用 Object.seal() 否则会报错
+      console.log(this.canEditor);
+      console.log(this.readOnly);
     },
     onChange(editor) {
       this.$emit('input', editor.getHtml())
@@ -66,11 +82,6 @@ export default {
     if (editor == null) return
     editor.destroy() // 组件销毁时，及时销毁 editor ，重要！！！
   },
-  test(){
-    const editor = this.editor
-    if(editor == null) return
-    editor.clear();
-  }
 }
 </script>
 

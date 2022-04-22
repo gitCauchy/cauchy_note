@@ -30,7 +30,7 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
-              <el-button type="primary" icon="el-icon-edit" :disabled="scope.row.isRevisable === 0"
+              <el-button type="primary" :icon="scope.row.isRevisable ===1?'el-icon-edit':'el-icon-tickets'"
                          @click="handleUpdate(scope.$index,scope.row)"></el-button>
             </el-tooltip>
           </template>
@@ -47,13 +47,15 @@
       :page-sizes="[10,15,20]"
       :total="total">
     </el-pagination>
-    <el-dialog title="编辑" :visible.sync="dialogVisible" :fullscreen=true>
+    <el-dialog title="编辑" :visible.sync="dialogVisible" :fullscreen=true @close="closeDialog">
       <el-form :model="article" ref="articleForm" label-width="100px">
         <el-form-item>
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <WangEditor :parent-content="article.content" @input="handleTinymceInput"></WangEditor>
+          <WangEditor :can-editor="article.isRevisable === 1" :parent-content="article.content"
+                      @input="handleTinymceInput"
+                      prop="textEditor"></WangEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -93,6 +95,9 @@ export default {
     this.getList();
   },
   methods: {
+    closeDialog() {
+      this.$refs.textEditor.editor.clear();
+    },
     handleTinymceInput(value) {
       this.article.content = value;
     },
@@ -141,11 +146,9 @@ export default {
           this.dialogVisible = false;
           this.getList();
         })
-      this.$router.go(0)
     },
     handleCancel() {
       this.dialogVisible = false;
-      this.$router.go(0);
     },
     handleAdd() {
       this.article = {}

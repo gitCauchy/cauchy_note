@@ -33,14 +33,25 @@ export function sendCheckCode(username) {
   })
 }
 
-export function resetPassword(username,newPassword,checkCode){
+export function resetPassword(username, newPassword, checkCode) {
   return request({
-    url:'/user/resetPassword',
-    method:'post',
-    data:{
+    url: '/user/resetPassword',
+    method: 'post',
+    data: {
       username,
       newPassword,
       checkCode
+    }
+  })
+}
+
+export function checkToken(token, username) {
+  return request({
+    url: '/checkToken',
+    method: 'get',
+    headers: {
+      token,
+      username
     }
   })
 }
