@@ -53,7 +53,7 @@
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <TinymceEditor :parent-content="article.content" @input="handleTinymceInput"></TinymceEditor>
+          <WangEditor :parent-content="article.content" @input="handleTinymceInput"></WangEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -68,11 +68,11 @@
 <script>
 import {modifyArticle} from "@/api/article";
 import {getSharedArticleList} from "@/api/share";
-import TinymceEditor from "@/components/tinymce-editor";
+import WangEditor from "@/components/wangeditor";
 
 export default {
   name: "Share",
-  components: {TinymceEditor},
+  components: {WangEditor},
   data() {
     return {
       queryInfo: {

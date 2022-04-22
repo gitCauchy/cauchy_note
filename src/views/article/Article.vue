@@ -3,7 +3,7 @@
     <el-card class="search-container" shadow="never">
       <el-row>
         <el-col :span="15">
-          <el-input placeholder="标题" v-model="queryInfo.searchWord" @keyup.enter.native="handleSearchList"clearable>
+          <el-input placeholder="标题" v-model="queryInfo.searchWord" @keyup.enter.native="handleSearchList" clearable>
             <el-button slot="append" icon="el-icon-search" @click="handleSearchList"></el-button>
           </el-input>
         </el-col>
@@ -62,7 +62,8 @@
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <TinymceEditor :parent-content="article.content" @input="handleTinymceInput"></TinymceEditor>
+          <WangEditor :parent-content="article.content" @input="handleTinymceInput"
+                      style="width: 85%"></WangEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -104,12 +105,12 @@
 import {deleteArticle, modifyArticle, addArticle, getArticleList} from "@/api/article";
 import {addArticleShare} from "@/api/share";
 import {getFriendList} from "@/api/friend";
-import TinymceEditor from "@/components/tinymce-editor";
+import WangEditor from "@/components/wangeditor";
 
 
 export default {
   name: "articleList",
-  components: {TinymceEditor},
+  components: {WangEditor},
   data() {
     return {
       shareDialogVisible: false,
