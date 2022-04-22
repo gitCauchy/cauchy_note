@@ -58,22 +58,24 @@
     </el-dialog>
 
     <el-dialog title="分享" :visible.sync="shareDialogVisible" :fullscreen=false>
-      <el-form ref="shareForm" label-width="100px">
-        <el-form-item label="分享笔记:">
-          <el-select v-model="articleSelectValue" placeholder="请选择笔记" style="width: 75%">
-            <el-option v-for="item in articleOptions" :key="item.value" :label="item.label" :value=item.value>
+      <el-form ref="shareForm" label-width="100px" :model="shareForm" :rules="rules">
+        <el-form-item label="分享笔记:" prop="article">
+          <el-select v-model="shareForm.articleSelectValue" placeholder="请选择笔记" style="width: 75%">
+            <el-option v-for="item in shareForm.articleOptions" :key="item.value" :label="item.label" :value=item.value>
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="分享期限">
-          <el-select v-model="validDaySelectValue" placeholder="请选择期限" style="width: 75%">
-            <el-option v-for="item in validDayOptions" :key="item.value" :label="item.label" :value=item.value>
+        <el-form-item label="分享期限" prop="day">
+          <el-select v-model="shareForm.validDaySelectValue" placeholder="请选择期限" style="width: 75%">
+            <el-option v-for="item in shareForm.validDayOptions" :key="item.value" :label="item.label"
+                       :value=item.value>
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="能否编辑">
-          <el-select v-model="isRevisableSelectValue" placeholder="请选择是否允许编辑" style="width: 75%">
-            <el-option v-for="item in isRevisableOptions" :key="item.value" :label="item.label" :value=item.value>
+        <el-form-item label="能否编辑" prop="revisable">
+          <el-select v-model="shareForm.isRevisableSelectValue" placeholder="请选择是否允许编辑" style="width: 75%">
+            <el-option v-for="item in shareForm.isRevisableOptions" :key="item.value" :label="item.label"
+                       :value=item.value>
             </el-option>
           </el-select>
         </el-form-item>
@@ -95,19 +97,26 @@ export default {
   name: "Friend",
   data() {
     return {
-      articleSelectValue: '',
-      articleOptions: [],
-      validDaySelectValue: '',
-      validDayOptions: [
-        {value: 1, label: '1 天'},
-        {value: 3, label: '3 天'},
-        {value: 7, label: '7 天'},
-        {value: 30, label: '30 天'},
-      ],
-      isRevisableSelectValue: '',
-      isRevisableOptions: [
-        {value: 1, label: '是'},
-        {value: 0, label: '否'}],
+      shareForm: {
+        articleSelectValue: '',
+        articleOptions: [],
+        validDaySelectValue: '',
+        validDayOptions: [
+          {value: 1, label: '1 天'},
+          {value: 3, label: '3 天'},
+          {value: 7, label: '7 天'},
+          {value: 30, label: '30 天'},
+        ],
+        isRevisableSelectValue: '',
+        isRevisableOptions: [
+          {value: 1, label: '是'},
+          {value: 0, label: '否'}],
+      },
+      rules: {
+        article: [{required: true, message: '请选择好友', trigger: blur}],
+        day: [{required: true, message: '请选择天数', trigger: blur}],
+        revisable: [{required: true, message: '请选择能否编辑', trigger: blur}]
+      },
       shareDialogVisible: false,
       queryInfo: {
         pageNum: 1,
@@ -136,7 +145,7 @@ export default {
       getArticleList(JSON.parse(sessionStorage.userInfo).id, 1000, 1, "")
         .then(response => {
             for (let i = 0; i < response.articles.length; i++) {
-              this.articleOptions.push({value: response.articles[i].id, label: response.articles[i].title})
+              this.shareForm.articleOptions.push({value: response.articles[i].id, label: response.articles[i].title})
             }
           }
         )
@@ -178,7 +187,7 @@ export default {
       )
     },
     handleCancel() {
-      this.searchDialogVisible = false;
+      this.shareDialogVisible = false;
     },
     searchFriend() {
       this.searchDialogVisible = true;
@@ -208,20 +217,26 @@ export default {
       }
     },
     handleShareDialogConfirm() {
-      addArticleShare(JSON.parse(sessionStorage.userInfo).id,
-        this.friend.id,
-        this.articleSelectValue,
-        this.validDaySelectValue,
-        this.isRevisableSelectValue)
-        .then(response => {
-          if (response === 100000) {
-            this.$message({
-              message: '分享成功！',
-              type: 'success'
-            });
-            this.shareDialogVisible = false;
-          }
-        })
+      this.$refs['shareForm'].validate(valid => {
+        if (!valid) {
+          this.$message.error("请选择提示内容!");
+        } else {
+          addArticleShare(JSON.parse(sessionStorage.userInfo).id,
+            this.friend.id,
+            this.articleSelectValue,
+            this.validDaySelectValue,
+            this.isRevisableSelectValue)
+            .then(response => {
+              if (response === 100000) {
+                this.$message({
+                  message: '分享成功！',
+                  type: 'success'
+                });
+                this.shareDialogVisible = false;
+              }
+            })
+        }
+      })
     }
   },
 }
