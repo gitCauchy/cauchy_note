@@ -26,7 +26,6 @@ export default {
   components: {Editor, Toolbar},
   data() {
     return {
-      readOnly: !this.canEditor,
       editor: '',
       html: this.parentContent,
       toolbarConfig: {
@@ -41,24 +40,16 @@ export default {
         // autoFocus: false,
         // 所有的菜单配置，都要在 MENU_CONF 属性下
         MENU_CONF: {},
-        readOnly: this.readOnly
       }
     }
   },
   props: {
-    canEditor: {
-      type: Boolean,
-      default: false,
-    },
     parentContent: {
       type: String,
       default: '',
     },
   },
   watch: {
-    canEditor(){
-      this.readOnly = !this.canEditor;
-    },
     parentContent() {
       this.html = this.parentContent;
     }
@@ -66,8 +57,6 @@ export default {
   methods: {
     onCreated(editor) {
       this.editor = Object.seal(editor) // 【注意】一定要用 Object.seal() 否则会报错
-      console.log(this.canEditor);
-      console.log(this.readOnly);
     },
     onChange(editor) {
       this.$emit('input', editor.getHtml())

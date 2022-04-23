@@ -30,7 +30,7 @@
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="编辑" placement="top">
-              <el-button type="primary" :icon="scope.row.isRevisable ===1?'el-icon-edit':'el-icon-tickets'"
+              <el-button type="primary" :icon="scope.row.isRevisable ===0?'el-icon-edit':'el-icon-tickets'"
                          @click="handleUpdate(scope.$index,scope.row)"></el-button>
             </el-tooltip>
           </template>
@@ -48,19 +48,20 @@
       :total="total">
     </el-pagination>
     <el-dialog title="编辑" :visible.sync="dialogVisible" :fullscreen=true @close="closeDialog">
-      <el-form :model="article" ref="articleForm" label-width="100px">
+      <el-form :model="article" ref="modifyForm" label-width="100px">
         <el-form-item>
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <WangEditor :can-editor="article.isRevisable === 1" :parent-content="article.content"
-                      @input="handleTinymceInput"
-                      prop="textEditor"></WangEditor>
+          <WangEditor :can-edit="article.isRevisable === 0" :parent-content="article.content"
+                      @input="handleEditorInput" style="width: 85%"
+                      ref="textEditor"></WangEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCancel" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button type="primary" :disabled="article.isRevisable===1" @click="handleDialogConfirm()" size="small">确
+          定</el-button>
       </span>
     </el-dialog>
 
@@ -98,7 +99,7 @@ export default {
     closeDialog() {
       this.$refs.textEditor.editor.clear();
     },
-    handleTinymceInput(value) {
+    handleEditorInput(value) {
       this.article.content = value;
     },
     handleDisplay(content) {

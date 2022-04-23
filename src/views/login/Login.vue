@@ -57,6 +57,7 @@ export default {
             if (response.SystemStatusCode === 100000) {
               sessionStorage.setItem("userInfo", JSON.stringify(response.userInfo));
               sessionStorage.setItem("token", response.token);
+              sessionStorage.setItem("username", this.loginForm.username);
               this.$store.commit("setMenuList", response.userInfo.menus)
               initDynamicRouter()
               this.$router.push("/home")

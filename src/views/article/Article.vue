@@ -64,12 +64,12 @@
           <el-input v-model="article.title" style="width: 85%"/>
         </el-form-item>
         <el-form-item>
-          <WangEditor ref="textEditor" :parent-content="article.content" @input="handleTinymceInput"
+          <WangEditor ref="textEditor" :parent-content="article.content" @input="handleEditorInput"
                       style="width: 85%"></WangEditor>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="small">取 消</el-button>
+        <el-button @click="handleCancel('editDialog')" size="small">取 消</el-button>
         <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
       </span>
     </el-dialog>
@@ -97,7 +97,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="small">取 消</el-button>
+        <el-button @click="handleCancel('shareDialog')" size="small">取 消</el-button>
         <el-button type="primary" @click="handleShareDialogConfirm" size="small">分 享</el-button>
       </span>
     </el-dialog>
@@ -159,7 +159,7 @@ export default {
     this.getFriendList();
   },
   methods: {
-    handleTinymceInput(value) {
+    handleEditorInput(value) {
       this.article.content = value;
     },
     handleDisplay(content) {
@@ -256,8 +256,12 @@ export default {
           })
       }
     },
-    handleCancel() {
-      this.shareDialogVisible = false;
+    handleCancel(dialog) {
+      if(dialog === 'editDialog'){
+        this.dialogVisible = false;
+      }else{
+        this.shareDialogVisible = false;
+      }
     },
     handleAdd() {
       this.article = {}
