@@ -18,31 +18,26 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/login',
-    name: 'Login',
     component: Login
   },
   {
     path: '/register',
-    name: 'Register',
     component: Register
   },
   {
     path: '/resetPassword',
-    name: 'ResetPassword',
     component: ResetPassword
   },
   {
     path: '/',
-    redirect: 'Login'
+    redirect: '/login'
   },
   {
     path: '/home',
-    name: 'Main',
     component: Main,
     children: [
       {
         path: '/home',
-        name: 'home',
         component: () => import('../views/home/Home')
       },
     ]
@@ -72,7 +67,7 @@ router.beforeEach((to, from, next) => {
         .then(response => {
           if (!response) {
             next({path: '/login'})
-          }else {
+          } else {
             next(to);
           }
         })
