@@ -65,7 +65,7 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     const token = sessionStorage.token
-    const username = JSON.parse(sessionStorage.userInfo).username
+    const username = sessionStorage.getItem("username")
     if (!token) {
       next({path: '/login'})
     } else {
