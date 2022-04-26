@@ -259,8 +259,12 @@ export default {
                     this.$message.info("好友请求发送成功，消息推送失败！")
                   }
                 })
-            } else {
-              this.$message.error("好友请求发送失败")
+            } else if(response === -400002){
+              this.$message.info("该用户已添加为好友");
+              this.searchDialogVisible = false;
+            }else{
+              this.$message.error("请求错误！")
+              this.searchDialogVisible = false;
             }
           })
       }

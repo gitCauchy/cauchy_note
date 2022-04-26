@@ -140,6 +140,17 @@ export default {
             })
         })
     },
+    handleRestore(index,row){
+      restoreArticle(row.id)
+      .then(response=>{
+        if(response === 100000){
+          this.$message.success("恢复成功！")
+          this.getList();
+        }else {
+          this.$message.error("恢复失败！");
+        }
+      })
+    },
     restoreAll() {
       restoreAllArticle(JSON.parse(sessionStorage.userInfo).id)
         .then(response => {

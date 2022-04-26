@@ -287,7 +287,8 @@ export default {
             this.shareForm.validDaySelectValue, this.shareForm.isRevisableSelectValue)
             .then(response => {
               if (response === 100000) {
-                addNewMessage(sessionStorage.getItem("userInfo").id, this.friendSelectValue, 1, "收到了好友的分享", 0)
+                addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.shareForm.friendSelectValue, 1,
+                  "收到了好友的分享", 0)
                   .then(response => {
                     if (response === 100000) {
                       this.$message({
