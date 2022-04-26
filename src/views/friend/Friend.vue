@@ -62,20 +62,20 @@
 
     <el-dialog title="分享" :visible.sync="shareDialogVisible" :fullscreen=false>
       <el-form ref="shareForm" label-width="100px" :model="shareForm" :rules="rules">
-        <el-form-item label="分享笔记:" prop="article">
+        <el-form-item label="分享笔记:" prop="articleSelectValue">
           <el-select v-model="shareForm.articleSelectValue" placeholder="请选择笔记" style="width: 75%">
             <el-option v-for="item in shareForm.articleOptions" :key="item.value" :label="item.label" :value=item.value>
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="分享期限" prop="day">
+        <el-form-item label="分享期限" prop="validDaySelectValue">
           <el-select v-model="shareForm.validDaySelectValue" placeholder="请选择期限" style="width: 75%">
             <el-option v-for="item in shareForm.validDayOptions" :key="item.value" :label="item.label"
                        :value=item.value>
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="能否编辑" prop="revisable">
+        <el-form-item label="能否编辑" prop="isRevisableSelectValue">
           <el-select v-model="shareForm.isRevisableSelectValue" placeholder="请选择是否允许编辑" style="width: 75%">
             <el-option v-for="item in shareForm.isRevisableOptions" :key="item.value" :label="item.label"
                        :value=item.value>
@@ -116,7 +116,7 @@ import {
 } from "@/api/friend";
 import {getArticleList} from "@/api/article";
 import {addArticleShare} from "@/api/share";
-import {addFriendRequestMessage} from "@/api/message";
+import {addNewMessage} from "@/api/message";
 
 export default {
   name: "Friend",
@@ -141,9 +141,9 @@ export default {
       },
       friendRequestList: null,
       rules: {
-        article: [{required: true, message: '请选择好友', trigger: blur}],
-        day: [{required: true, message: '请选择天数', trigger: blur}],
-        revisable: [{required: true, message: '请选择能否编辑', trigger: blur}]
+        articleSelectValue: [{required: true, message: '请选择好友', trigger: blur}],
+        validDaySelectValue: [{required: true, message: '请选择天数', trigger: blur}],
+        isRevisableSelectValue: [{required: true, message: '请选择能否编辑', trigger: blur}]
       },
       shareDialogVisible: false,
       friendRequestDialogVisible: false,
@@ -248,7 +248,7 @@ export default {
         addFriendRequest(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id)
           .then(response => {
             if (response === 100000) {
-              addFriendRequestMessage(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id,
+              addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id,
                 0, JSON.parse(sessionStorage.userInfo).username + "请求加为好友", 0)
                 .then(response => {
                   if (response === 100000) {
@@ -272,16 +272,22 @@ export default {
         } else {
           addArticleShare(JSON.parse(sessionStorage.userInfo).id,
             this.friend.id,
-            this.articleSelectValue,
-            this.validDaySelectValue,
-            this.isRevisableSelectValue)
+            this.shareForm.articleSelectValue,
+            this.shareForm.validDaySelectValue,
+            this.shareForm.isRevisableSelectValue)
             .then(response => {
               if (response === 100000) {
-                this.$message({
-                  message: '分享成功！',
-                  type: 'success'
-                });
-                this.shareDialogVisible = false;
+                addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.friend.id, 1, "好友分享了笔记", 0)
+                  .then(response => {
+                    if (response === 100000) {
+                      this.$message({
+                        message: '分享成功！',
+                        type: 'success'
+                      });
+                      this.shareDialogVisible = false;
+                    }
+                  })
+
               }
             })
         }

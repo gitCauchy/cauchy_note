@@ -18,5 +18,8 @@ export default {
   setMenuList(state, menuList) {
     this.state.userMenuList = menuList;
     sessionStorage.setItem("userMenuList", JSON.stringify(menuList))
+  },
+  changeMessageStatus(state, status) {
+    state.messageStatus = status;
   }
 }

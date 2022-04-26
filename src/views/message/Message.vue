@@ -8,6 +8,7 @@
           <template slot-scope="scope">
             <span v-if="scope.row.messageType===0">好友验证</span>
             <span v-if="scope.row.messageType===1">笔记分享</span>
+            <span v-if="scope.row.messageType===3">好友反馈</span>
           </template>
         </el-table-column>
 
@@ -19,14 +20,10 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button-group v-if="scope.row.messageType===1">
+            <el-button-group v-if="scope.row.messageType===1 || scope.row.messageType === 3">
               <el-tooltip effect="dark" content="标记为已读" placement="top">
                 <el-button type="primary" icon="el-icon-check"
-                           @click=""/>
-              </el-tooltip>
-              <el-tooltip effect="dark" content="删除" placement="top">
-                <el-button type="danger" icon="el-icon-close"
-                           @click=""/>
+                           @click="handleReadMessage(scope.row.id)"/>
               </el-tooltip>
             </el-button-group>
             <el-button-group v-if="scope.row.messageType===0">
@@ -36,7 +33,7 @@
               </el-tooltip>
               <el-tooltip effect="dark" content="拒绝" placement="top">
                 <el-button type="info" icon="el-icon-error"
-                           @click="handleRejectFriendRequest"/>
+                           @click="handleRejectFriendRequest(scope.row.id,scope.row.senderId,scope.row.receiverId)"/>
               </el-tooltip>
             </el-button-group>
           </template>
@@ -50,7 +47,7 @@
 import {
   deleteUser,
 } from "@/api/admin";
-import {getMessageList, readMessage} from "@/api/message";
+import {addNewMessage, getMessageList, readMessage} from "@/api/message";
 import {addFriend, deleteFriendRequest} from "@/api/friend";
 
 export default {
@@ -76,16 +73,13 @@ export default {
         })
     },
 
-    handleDelete(index, row) {
-      this.$confirm('是否删除该用户？', '提示',
-        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}).then(() => {
-          deleteUser(row.id)
-            .then(response => {
-              this.$message.success("删除成功！")
-              this.getList();
-            })
+    handleReadMessage(id) {
+      readMessage(id).then(response => {
+        if (response === 100000) {
+          this.getList();
+          this.refreshMessageTips();
         }
-      )
+      })
     },
     handleAgreeFriendRequest(id, senderId, receiverId) {
       addFriend(senderId, receiverId)
@@ -94,15 +88,16 @@ export default {
             addFriend(receiverId, senderId)
               .then(response => {
                 if (response === 100000) {
-                  readMessage(id).then(response=>{
-                    if(response === 100000){
-                      deleteFriendRequest(senderId,receiverId)
-                      .then(response=>{
-                        if(response === 100000){
-                          this.$message.success("添加成功！");
-                          this.getList();
-                        }
-                      })
+                  readMessage(id).then(response => {
+                    if (response === 100000) {
+                      deleteFriendRequest(senderId, receiverId)
+                        .then(response => {
+                          if (response === 100000) {
+                            this.$message.success("添加成功！");
+                            this.getList();
+                            this.refreshMessageTips();
+                          }
+                        })
                     }
                   })
                 }
@@ -110,8 +105,29 @@ export default {
           }
         })
     },
-    handleRejectFriendRequest() {
+    handleRejectFriendRequest(id, senderId, receiverId) {
+      deleteFriendRequest(senderId, receiverId)
+        .then(response => {
+          if (response === 100000) {
+            addNewMessage(receiverId, senderId, 3, "您的好友请求被拒绝", 0)
+              .then(response => {
+                if (response === 100000) {
+                  readMessage(id)
+                    .then(response => {
+                      if (response === 100000) {
+                        this.getList();
+                        this.refreshMessageTips();
+                      }
+                    })
+                }
+              })
+          }
+        })
 
+    },
+    refreshMessageTips() {
+      let messageStatus = this.$store.state.messageStatus;
+      this.$store.commit('changeMessageStatus', !messageStatus);
     }
   }
 }

@@ -9,6 +9,7 @@ Vue.use(Vuex)
 const state = {
   isCollapse: false,
   currentMenu: null,
+  messageStatus: false,
   tabList: [
     {
       path: '/',

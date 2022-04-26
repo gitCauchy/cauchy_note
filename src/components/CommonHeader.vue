@@ -66,7 +66,15 @@ export default {
   computed: {
     ...mapState({
       current: (state) => state.currentMenu,
-    })
+    }),
+    messageRefreshStatus(){
+      return this.$store.state.messageStatus;
+    }
+  },
+  watch:{
+    messageRefreshStatus(){
+      this.getMessageCount();
+    }
   }
 }
 </script>

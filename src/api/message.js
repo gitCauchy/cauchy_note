@@ -1,6 +1,6 @@
 import {request} from "@/network/request";
 
-export function addFriendRequestMessage(senderId, receiverId, messageType, messageInfo, status) {
+export function addNewMessage(senderId, receiverId, messageType, messageInfo, status) {
   return request({
     url: '/message/addNewMessage',
     method: 'post',
