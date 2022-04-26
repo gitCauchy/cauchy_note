@@ -112,7 +112,7 @@ import {
 } from "@/api/admin";
 
 export default {
-  name: "userList",
+  name: "User",
   data() {
     const validUsername = (rule, value, callback) => {
       if (value) {

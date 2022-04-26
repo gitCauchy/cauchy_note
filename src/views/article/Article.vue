@@ -113,7 +113,7 @@ import WangEditor from "@/components/wangeditor";
 
 
 export default {
-  name: "articleList",
+  name: "Article",
   components: {WangEditor},
   data() {
     return {

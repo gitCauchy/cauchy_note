@@ -45,6 +45,18 @@ const shareRule = {
   component: () => import('../views/article/Share')
 }
 
+const recycleRule = {
+  path: '/recycle',
+  name: 'recycle',
+  component: () => import('../views/article/Recycle')
+}
+
+const messageRule = {
+  path: '/message',
+  name: 'message',
+  component: () => import('../views/message/Message')
+}
+
 const ruleMapping = {
   'user': userRule,
   'role': roleRule,
@@ -54,6 +66,20 @@ const ruleMapping = {
   'userinfo': userInfoRule,
   'friend': friendRule,
   'share': shareRule,
+  'recycle': recycleRule,
+  'message': messageRule,
 }
 
-export {userRule, roleRule, permissionRule, menuRule, articleRule, userInfoRule, friendRule, shareRule, ruleMapping}
+export {
+  userRule,
+  roleRule,
+  permissionRule,
+  menuRule,
+  articleRule,
+  userInfoRule,
+  friendRule,
+  shareRule,
+  ruleMapping,
+  recycleRule,
+  messageRule,
+}

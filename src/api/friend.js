@@ -43,3 +43,35 @@ export function searchFriend(friendName) {
     }
   })
 }
+
+export function addFriendRequest(userId, friendId) {
+  return request({
+    url: '/friend/addFriendRequest',
+    method: 'get',
+    params: {
+      userId,
+      friendId
+    }
+  })
+}
+
+export function getFriendRequestList(userId) {
+  return request({
+    url: '/friend/getFriendRequestList',
+    method: 'get',
+    params: {
+      userId
+    }
+  })
+}
+
+export function deleteFriendRequest(userId, friendId) {
+  return request({
+    url: '/friend/deleteFriendRequest',
+    method: 'get',
+    params: {
+      userId,
+      friendId
+    }
+  })
+}

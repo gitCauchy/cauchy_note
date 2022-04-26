@@ -29,11 +29,12 @@ export default {
       editor: '',
       html: this.parentContent,
       toolbarConfig: {
-        toolbarKeys: ["bold", "underline", "italic", "through", "code", "clearStyle", "headerSelect", "header1", "header2", "header3",
-          "color", "bgColor", "insertLink", "editLink", "unLink", "viewLink", "blockquote", "emotion", "fontSize", "fontFamily",
-          "indent", "delIndent", "justifyLeft", "justifyRight", "justifyCenter", "lineHeight", "redo", "undo", "divider", "codeBlock",
-          "bulletedList", "numberedList", "insertTable", "deleteTable", "insertTableRow", "deleteTableRow", "insertTableCol",
-          "deleteTableCol", "tableHeader", "tableFullWidth", "uploadImage", "codeSelectLang"],
+        toolbarKeys: ["bold", "underline", "italic", "through", "code", "clearStyle", "headerSelect", "header1",
+          "header2", "header3", "color", "bgColor", "insertLink", "editLink", "unLink", "viewLink", "blockquote",
+          "emotion", "fontSize", "fontFamily", "indent", "delIndent", "justifyLeft", "justifyRight", "justifyCenter",
+          "lineHeight", "redo", "undo", "divider", "codeBlock", "bulletedList", "numberedList", "insertTable",
+          "deleteTable", "insertTableRow", "deleteTableRow", "insertTableCol", "deleteTableCol", "tableHeader",
+          "tableFullWidth"],
       },
       editorConfig: {
         placeholder: '请输入内容...',

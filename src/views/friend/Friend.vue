@@ -7,6 +7,9 @@
             <el-button slot="append" icon="el-icon-search" @click="searchFriend"></el-button>
           </el-input>
         </el-col>
+        <el-col :span="8" style="text-align: right">
+          <el-button type="primary" @click="this.openFriendRequestDialog">我的好友请求</el-button>
+        </el-col>
       </el-row>
     </el-card>
     <div class="data-container">
@@ -53,7 +56,7 @@
       <h2 v-else style="text-align: center">用户不存在</h2>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleAddFriend" size="small" v-show="isNull">添 加</el-button>
-        <el-button @click="handleCancel" size="small">关 闭</el-button>
+        <el-button @click="handleCancel('searchDialog')" size="small">关 闭</el-button>
       </span>
     </el-dialog>
 
@@ -81,21 +84,45 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleCancel" size="small">取 消</el-button>
+        <el-button @click="handleCancel('shareDialog')" size="small">取 消</el-button>
         <el-button type="primary" @click="handleShareDialogConfirm" size="small">确 定</el-button>
       </span>
+    </el-dialog>
+    <el-dialog title="好友请求列表" :visible.sync="friendRequestDialogVisible" :fullscreen=false>
+      <el-table :data="friendRequestList" border style="width: 100%">
+        <el-table-column label="#" align="center" type="index"></el-table-column>
+        <el-table-column label="用户名" align="center">
+          <template slot-scope="scope">{{ scope.row.username }}</template>
+        </el-table-column>
+        <el-table-column label="邮箱" align="center">
+          <template slot-scope="scope">{{ scope.row.email }}</template>
+        </el-table-column>
+        <el-table-column label="状态" align="center">
+          <template slot-scope="scope">已发送</template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import {getFriendList, deleteFriend, searchFriend, addFriend} from "@/api/friend";
+import {
+  getFriendList,
+  deleteFriend,
+  searchFriend,
+  addFriend,
+  addFriendRequest,
+  getFriendRequestList, getFriendRequestResult
+} from "@/api/friend";
 import {getArticleList} from "@/api/article";
 import {addArticleShare} from "@/api/share";
+import {addFriendRequestMessage} from "@/api/message";
 
 export default {
   name: "Friend",
   data() {
+    const MESSAGE_TYPE_FRIEND_REQUEST = 0;
+    const MESSAGE_TYPE_ARTICLE_SHARE = 1;
     return {
       shareForm: {
         articleSelectValue: '',
@@ -112,12 +139,14 @@ export default {
           {value: 1, label: '是'},
           {value: 0, label: '否'}],
       },
+      friendRequestList: null,
       rules: {
         article: [{required: true, message: '请选择好友', trigger: blur}],
         day: [{required: true, message: '请选择天数', trigger: blur}],
         revisable: [{required: true, message: '请选择能否编辑', trigger: blur}]
       },
       shareDialogVisible: false,
+      friendRequestDialogVisible: false,
       queryInfo: {
         pageNum: 1,
         pageSize: 5,
@@ -139,6 +168,7 @@ export default {
   created() {
     this.getList();
     this.getArticleList();
+    this.getFriendRequestList();
   },
   methods: {
     getArticleList() {
@@ -161,6 +191,13 @@ export default {
           this.listLoading = false;
           this.friendList = response;
           this.total = this.friendList.length;
+        })
+
+    },
+    getFriendRequestList() {
+      getFriendRequestList(JSON.parse(sessionStorage.userInfo).id)
+        .then(response => {
+          this.friendRequestList = response;
         })
     },
     handleSizeChange(value) {
@@ -186,8 +223,12 @@ export default {
         }
       )
     },
-    handleCancel() {
-      this.shareDialogVisible = false;
+    handleCancel(dialog) {
+      if (dialog === 'searchDialog') {
+        this.searchDialogVisible = false;
+      } else {
+        this.shareDialogVisible = false;
+      }
     },
     searchFriend() {
       this.searchDialogVisible = true;
@@ -204,14 +245,22 @@ export default {
         this.$message.error("不可添加自己为好友")
         this.searchDialogVisible = false;
       } else {
-        addFriend(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id)
+        addFriendRequest(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id)
           .then(response => {
             if (response === 100000) {
-              this.$message.success("添加成功")
-              this.searchDialogVisible = false;
-              this.getList();
+              addFriendRequestMessage(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id,
+                0, JSON.parse(sessionStorage.userInfo).username + "请求加为好友", 0)
+                .then(response => {
+                  if (response === 100000) {
+                    this.$message.success("好友请求发送成功")
+                    this.searchDialogVisible = false;
+                    this.getList();
+                  } else {
+                    this.$message.info("好友请求发送成功，消息推送失败！")
+                  }
+                })
             } else {
-              this.$message.error("添加失败")
+              this.$message.error("好友请求发送失败")
             }
           })
       }
@@ -237,8 +286,12 @@ export default {
             })
         }
       })
-    }
-  },
+    },
+    openFriendRequestDialog() {
+      this.friendRequestDialogVisible = true;
+      this.getFriendRequestList();
+    },
+  }
 }
 </script>
 
