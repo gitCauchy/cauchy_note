@@ -62,6 +62,7 @@ import {
   restoreAllArticle,
   restoreArticle
 } from "@/api/recycle";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
   name: "Recycle",
@@ -131,7 +132,7 @@ export default {
         .then(() => {
           deleteArticlePhysical(row.id)
             .then(response => {
-              if (response === 100000) {
+              if (response === SystemStatusCode.SUCCESS) {
                 this.$message.success("清理成功！");
                 this.getList();
               } else {
@@ -143,7 +144,7 @@ export default {
     handleRestore(index,row){
       restoreArticle(row.id)
       .then(response=>{
-        if(response === 100000){
+        if(response === SystemStatusCode.SUCCESS){
           this.$message.success("恢复成功！")
           this.getList();
         }else {
@@ -154,7 +155,7 @@ export default {
     restoreAll() {
       restoreAllArticle(JSON.parse(sessionStorage.userInfo).id)
         .then(response => {
-          if (response === 100000) {
+          if (response === SystemStatusCode.SUCCESS) {
             this.$message.success("恢复成功！");
             this.getList();
           } else {
@@ -168,7 +169,7 @@ export default {
         .then(() => {
           deleteAllArticlePhysical(JSON.parse(sessionStorage.userInfo).id)
             .then(response => {
-              if (response === 100000) {
+              if (response === SystemStatusCode.SUCCESS) {
                 this.$message.success("清理成功！");
                 this.getList();
               } else {

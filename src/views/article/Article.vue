@@ -111,6 +111,7 @@ import {addArticleShare} from "@/api/share";
 import {getFriendList} from "@/api/friend";
 import WangEditor from "@/components/wangeditor";
 import {addNewMessage} from "@/api/message";
+import {SystemStatusCode} from "@/utils/constant";
 
 
 export default {
@@ -215,7 +216,7 @@ export default {
         .then(() => {
             deleteArticle(row.id)
               .then(response => {
-                if (response === 100000) {
+                if (response === SystemStatusCode.SUCCESS) {
                   this.$message.success("删除成功！")
                   this.getList()
                 } else {
@@ -234,7 +235,7 @@ export default {
       if (this.isEdit) {
         modifyArticle(this.article.id, this.article.title, this.article.content)
           .then(response => {
-            if (response === 100000) {
+            if (response === SystemStatusCode.SUCCESS) {
               this.$message.success("修改成功");
               this.dialogVisible = false;
               this.getList();
@@ -246,7 +247,7 @@ export default {
       } else { // 如果是新增窗口
         addArticle(this.article.title, this.article.content, JSON.parse(sessionStorage.userInfo).id)
           .then(response => {
-            if (response === 100000) {
+            if (response === SystemStatusCode.SUCCESS) {
               this.$message.success("添加成功！");
               this.dialogVisible = false;
               this.getList();
@@ -286,11 +287,12 @@ export default {
           addArticleShare(JSON.parse(sessionStorage.userInfo).id, this.shareForm.friendSelectValue, this.article.id,
             this.shareForm.validDaySelectValue, this.shareForm.isRevisableSelectValue)
             .then(response => {
-              if (response === 100000) {
+              if (response === SystemStatusCode.SUCCESS )
+              {
                 addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.shareForm.friendSelectValue, 1,
                   "收到了好友的分享", 0)
                   .then(response => {
-                    if (response === 100000) {
+                    if (response === SystemStatusCode.SUCCESS) {
                       this.$message({
                         message: '分享成功！',
                         type: 'success'

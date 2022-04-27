@@ -72,6 +72,7 @@
 import {modifyArticle} from "@/api/article";
 import {getSharedArticleList} from "@/api/share";
 import WangEditor from "@/components/wangeditor";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
   name: "Share",
@@ -140,19 +141,20 @@ export default {
     handleDialogConfirm() {
       modifyArticle(this.article.id, this.article.title, this.article.content)
         .then(response => {
-          this.$message({
-            message: '修改成功！',
-            type: 'success'
-          });
+          if(response === SystemStatusCode.SUCCESS){
+            this.$message.success("修改成功！");
+            this.getList();
+          }else{
+            this.$message.error("修改失败！")
+          }
           this.dialogVisible = false;
-          this.getList();
         })
     },
     handleCancel() {
       this.dialogVisible = false;
     },
     handleAdd() {
-      this.article = {}
+      this.article = {};
       this.dialogVisible = true;
       this.isEdit = false;
     },

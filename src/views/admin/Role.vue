@@ -12,10 +12,10 @@
     <el-form class="operation-container" shadow="never">
       <i class="el-icon-tickets"/>
       <span>数据列表</span>
-      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd" style="margin:20px">添加</el-button>
+      <el-button size="mini" type="primary" @click="handleAdd" style="margin:20px">添加</el-button>
     </el-form>
     <div class="data-container">
-      <el-table ref="roleTable" :data="list" style="width:100%" v-loading="listLoading" border>
+      <el-table ref="roleTable" :data="roleList" style="width:100%" v-loading="listLoading" border>
         <el-table-column label="#" align="center" type="index"></el-table-column>
         <el-table-column label="角色名称" align="center">
           <template slot-scope="scope">{{ scope.row.roleName }}</template>
@@ -28,15 +28,15 @@
             <el-button-group>
               <el-tooltip effect="dark" content="编辑角色" placement="top">
                 <el-button type="primary" icon="el-icon-edit"
-                           @click="handleUpdate(scope.$index,scope.row)"></el-button>
+                           @click="handleUpdate(scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip effect="dark" content="分配权限" placement="top">
                 <el-button type="warning" icon="el-icon-setting"
-                           @click="handleSelectPermission(scope.$index,scope.row)"></el-button>
+                           @click="handleSelectPermission(scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip effect="dark" content="删除角色" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
-                           @click="handleDelete(scope.$index, scope.row)"></el-button>
+                           @click="handleDelete(scope.row)"></el-button>
               </el-tooltip>
             </el-button-group>
           </template>
@@ -54,12 +54,12 @@
       :total="total">
     </el-pagination>
     <el-dialog :title="isEdit?'编辑角色':'添加角色'" :visible.sync="dialogVisible" width="40%">
-      <el-form :model="role" ref="roleForm" label-width="150px" size="small">
+      <el-form :model="roleForm" ref="roleForm" label-width="150px" size="small">
         <el-form-item label="角色名称">
-          <el-input v-model="role.roleName" style="width:250px"></el-input>
+          <el-input v-model="roleForm.roleName" style="width:250px"></el-input>
         </el-form-item>
         <el-form-item label="描述">
-          <el-input v-model="role.roleDescription" style="width:250px" type="textarea" :rows="5"/>
+          <el-input v-model="roleForm.roleDescription" style="width:250px" type="textarea" :rows="5"/>
         </el-form-item>
       </el-form>
       <span slot="footer">
@@ -92,9 +92,10 @@ import {
   addNewRole,
   getAllPermissions
 } from "@/api/admin";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
-  name: 'roleList',
+  name: 'Role',
   data() {
     return {
       queryInfo: {
@@ -102,10 +103,10 @@ export default {
         pageSize: 5,
         keyword: "",
       },
-      list: null,
+      roleList: null,
       total: null,
       listLoading: false,
-      role: {},
+      roleForm: {},
       isEdit: false,
       permission: {},
       dialogVisible: false,
@@ -129,7 +130,7 @@ export default {
       this.listLoading = true;
       getAllRoles(this.queryInfo.pageNum, this.queryInfo.pageSize, this.queryInfo.keyword)
         .then(response => {
-          this.list = response.roles;
+          this.roleList = response.roles;
           this.total = response.total;
           this.listLoading = false;
         })
@@ -141,9 +142,9 @@ export default {
     handleAdd() {
       this.dialogVisible = true;
       this.isEdit = false;
-      this.role = {};
+      this.roleForm = {};
     },
-    handleSelectPermission(index, row) {
+    handleSelectPermission(row) {
       this.distributionRoleId = row.id;
       this.distributionDialogVisible = true;
       this.getPermissionListByRoleId(row.id);
@@ -160,12 +161,12 @@ export default {
           }
         })
     },
-    handleUpdate(index, row) {
+    handleUpdate(row) {
       this.dialogVisible = true;
       this.isEdit = true;
-      this.role = Object.assign({}, row)
+      this.roleForm = Object.assign({}, row)
     },
-    handleDelete(index, row) {
+    handleDelete(row) {
       this.$confirm('是否要删除角色？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -173,25 +174,38 @@ export default {
       }).then(() => {
         deleteRole(row.id)
           .then(response => {
-            this.$message.success("删除成功！");
-            this.getList();
+            if(response === SystemStatusCode.SUCCESS){
+              this.$message.success("删除成功！");
+              this.getList();
+            }else{
+              this.$message.error("删除失败！");
+            }
           })
       })
     },
     handleDialogConfirm() {
       if (this.isEdit) { // 更新操作
-        updateRole(this.role)
+        updateRole(this.roleForm)
           .then(response => {
-            this.$message.success("修改成功！");
+            if(response === SystemStatusCode.SUCCESS){
+              this.$message.success("修改成功！");
+              this.getList();
+            }else{
+              this.$message.error("修改失败！");
+            }
             this.dialogVisible = false;
-            this.getList();
           })
       } else { // 新增操作
-        addNewRole(this.role)
+        addNewRole(this.roleForm)
           .then(response => {
-            this.$message.success("添加成功！");
+            if (response === SystemStatusCode.SUCCESS) {
+              this.$message.success("添加成功！");
+              this.getList();
+            } else {
+              this.$message.error("添加失败！");
+            }
             this.dialogVisible = false;
-            this.getList();
+
 
           })
       }

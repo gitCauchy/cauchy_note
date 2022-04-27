@@ -35,6 +35,7 @@
 
 <script>
 import {sendCheckCode, resetPassword} from "@/api/login";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
   name: "ResetPassword",
@@ -105,7 +106,7 @@ export default {
       }, 1000)
       sendCheckCode(this.resetPasswordForm.username)
         .then(response => {
-          if (response.SystemStatusCode === 100000) {
+          if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
             this.$message.success("验证码发送成功！")
 
           } else {
@@ -120,7 +121,7 @@ export default {
         } else {
           resetPassword(this.resetPasswordForm.username, this.resetPasswordForm.password, this.resetPasswordForm.checkCode)
             .then(response => {
-              if (response.SystemStatusCode === 100000) {
+              if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
                 this.$message.success("修改成功！")
               } else {
                 this.$message.error("验证码错误！")

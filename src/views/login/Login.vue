@@ -27,6 +27,7 @@
 import {initDynamicRouter} from "@/router";
 import {login} from "@/api/login";
 import {goToLink} from "@/utils/public";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
 
@@ -54,7 +55,7 @@ export default {
           this.$message.error("请输入用户名密码");
         } else {
           login(this.loginForm.username, this.loginForm.password).then(response => {
-            if (response.SystemStatusCode === 100000) {
+            if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
               sessionStorage.setItem("userInfo", JSON.stringify(response.userInfo));
               sessionStorage.setItem("token", response.token);
               sessionStorage.setItem("username", this.loginForm.username);

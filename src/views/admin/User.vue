@@ -12,7 +12,7 @@
     <el-form class="operation-container" shadow="never">
       <i class="el-icon-tickets"/>
       <span>数据列表</span>
-      <el-button size="mini" type="primary" class="btn-add" @click="handleAdd()" style="margin:20px">添加</el-button>
+      <el-button size="mini" type="primary" @click="handleAdd()" style="margin:20px">添加</el-button>
     </el-form>
     <div class="data-container">
       <el-table ref="userTable" :data="userList" v-loading="listLoading" style="width:100%" border stripe>
@@ -37,15 +37,15 @@
             <el-button-group>
               <el-tooltip effect="dark" content="编辑用户" placement="top">
                 <el-button type="primary" icon="el-icon-edit"
-                           @click="handleUpdate(scope.$index,scope.row)"/>
+                           @click="handleUpdate(scope.row)"/>
               </el-tooltip>
               <el-tooltip effect="dark" content="分配角色" placement="top">
                 <el-button type="warning" icon="el-icon-setting"
-                           @click="handleSelectRole(scope.$index,scope.row)"/>
+                           @click="handleSelectRole(scope.row)"/>
               </el-tooltip>
               <el-tooltip effect="dark" content="删除用户" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
-                           @click="handleDelete(scope.$index, scope.row)"/>
+                           @click="handleDelete(scope.row)"/>
               </el-tooltip>
             </el-button-group>
           </template>
@@ -110,6 +110,7 @@ import {
   queryAllUsers,
   updateUser
 } from "@/api/admin";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
   name: "User",
@@ -187,18 +188,22 @@ export default {
         })
 
     },
-    handleDelete(index, row) {
+    handleDelete(row) {
       this.$confirm('是否删除该用户？', '提示',
         {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}).then(() => {
           deleteUser(row.id)
             .then(response => {
-              this.$message.success("删除成功！")
-              this.getList();
+              if (response === SystemStatusCode.SUCCESS) {
+                this.$message.success("删除成功！");
+                this.getList();
+              } else {
+                this.$message.error("删除失败！");
+              }
             })
         }
       )
     },
-    handleUpdate(index, row) {
+    handleUpdate(row) {
       this.dialogVisible = true;
       this.isEdit = true;
       this.user = Object.assign({}, row)
@@ -211,16 +216,24 @@ export default {
           if (this.isEdit) { // 如果是编辑窗口
             updateUser(this.user)
               .then(response => {
-                this.$message.success("修改成功！");
+                if (response === SystemStatusCode.SUCCESS) {
+                  this.$message.success("修改成功！");
+                  this.getList();
+                } else {
+                  this.$message.error("修改失败！");
+                }
                 this.dialogVisible = false;
-                this.getList();
               })
           } else { // 如果是新增窗口
             addUser(this.user)
               .then(response => {
-                this.$message.success("添加成功！");
+                if (response === SystemStatusCode.SUCCESS) {
+                  this.$message.success("添加成功！");
+                  this.getList();
+                } else {
+                  this.$message.error("添加失败！");
+                }
                 this.dialogVisible = false;
-                this.getList();
               })
           }
         }
@@ -231,7 +244,7 @@ export default {
       this.isEdit = false;
       this.user = {};
     },
-    handleSelectRole(index, row) {
+    handleSelectRole(row) {
       this.distributionUserId = row.id;
       this.distributionDialogVisible = true;
       this.getRoleListByUserId(row.id);
@@ -256,7 +269,11 @@ export default {
     handleDistributeDialogConfirm() {
       addRoleOfUser(this.distributionUserId, this.roleIds)
         .then(response => {
-          this.$message.success("分配成功！");
+          if (response === SystemStatusCode.SUCCESS) {
+            this.$message.success("分配成功！");
+          } else {
+            this.$message.error("分配失败");
+          }
           this.distributionDialogVisible = false;
         })
     }

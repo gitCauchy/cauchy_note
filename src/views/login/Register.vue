@@ -79,7 +79,7 @@ export default {
         } else {
           register(this.registerForm.username, this.registerForm.password, this.registerForm.email)
             .then(response => {
-              if (response === 100000) {
+              if (response === SystemStatusCode.SUCCESS) {
                 this.$message.success("注册成功！跳转至登录页面... ...")
                 this.$router.push('/login')
               } else if (response === -300000) {

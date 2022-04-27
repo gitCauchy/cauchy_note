@@ -32,6 +32,7 @@
 
 <script>
 import {modifyPassword} from "@/api/userinfo";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
   name: "UserInfo",
@@ -82,7 +83,7 @@ export default {
         } else {
           modifyPassword(this.username, this.userInfoForm.oldPassword, this.userInfoForm.newPassword)
             .then(response => {
-              if (response.SystemStatusCode === 100000) {
+              if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
                 this.$message.success("修改成功！")
               } else {
                 this.$message.error("密码错误！")

@@ -117,12 +117,11 @@ import {
 import {getArticleList} from "@/api/article";
 import {addArticleShare} from "@/api/share";
 import {addNewMessage} from "@/api/message";
+import {SystemStatusCode} from "@/utils/constant";
 
 export default {
   name: "Friend",
   data() {
-    const MESSAGE_TYPE_FRIEND_REQUEST = 0;
-    const MESSAGE_TYPE_ARTICLE_SHARE = 1;
     return {
       shareForm: {
         articleSelectValue: '',
@@ -247,11 +246,11 @@ export default {
       } else {
         addFriendRequest(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id)
           .then(response => {
-            if (response === 100000) {
+            if (response === SystemStatusCode.SUCCESS) {
               addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.searchResult.id,
                 0, JSON.parse(sessionStorage.userInfo).username + "请求加为好友", 0)
                 .then(response => {
-                  if (response === 100000) {
+                  if (response === SystemStatusCode.SUCCESS) {
                     this.$message.success("好友请求发送成功")
                     this.searchDialogVisible = false;
                     this.getList();
@@ -280,10 +279,10 @@ export default {
             this.shareForm.validDaySelectValue,
             this.shareForm.isRevisableSelectValue)
             .then(response => {
-              if (response === 100000) {
+              if (response === SystemStatusCode.SUCCESS) {
                 addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.friend.id, 1, "好友分享了笔记", 0)
                   .then(response => {
-                    if (response === 100000) {
+                    if (response === SystemStatusCode.SUCCESS) {
                       this.$message({
                         message: '分享成功！',
                         type: 'success'
