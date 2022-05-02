@@ -1,3 +1,3 @@
 export const SystemStatusCode = {
-  SUCCESS: SystemStatusCode.SUCCESS,
+  SUCCESS: 100000,
 }
