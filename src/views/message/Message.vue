@@ -49,7 +49,7 @@ import {
 } from "@/api/admin";
 import {addNewMessage, getMessageList, readMessage} from "@/api/message";
 import {addFriend, deleteFriendRequest} from "@/api/friend";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "Message",

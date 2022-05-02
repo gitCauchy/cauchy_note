@@ -92,7 +92,7 @@ import {
   addNewRole,
   getAllPermissions
 } from "@/api/admin";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: 'Role',

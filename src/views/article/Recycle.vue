@@ -62,7 +62,7 @@ import {
   restoreAllArticle,
   restoreArticle
 } from "@/api/recycle";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "Recycle",

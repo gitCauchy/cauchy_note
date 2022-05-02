@@ -117,7 +117,7 @@ import {
 import {getArticleList} from "@/api/article";
 import {addArticleShare} from "@/api/share";
 import {addNewMessage} from "@/api/message";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "Friend",

@@ -35,7 +35,7 @@
 
 <script>
 import {sendCheckCode, resetPassword} from "@/api/login";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "ResetPassword",

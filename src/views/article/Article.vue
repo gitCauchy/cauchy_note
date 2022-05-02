@@ -111,7 +111,7 @@ import {addArticleShare} from "@/api/share";
 import {getFriendList} from "@/api/friend";
 import WangEditor from "@/components/wangeditor";
 import {addNewMessage} from "@/api/message";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 
 export default {

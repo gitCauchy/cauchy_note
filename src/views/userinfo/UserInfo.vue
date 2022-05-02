@@ -32,7 +32,7 @@
 
 <script>
 import {modifyPassword} from "@/api/userinfo";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "UserInfo",

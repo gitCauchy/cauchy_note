@@ -72,7 +72,7 @@
 import {modifyArticle} from "@/api/article";
 import {getSharedArticleList} from "@/api/share";
 import WangEditor from "@/components/wangeditor";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "Share",

@@ -27,7 +27,7 @@
 import {initDynamicRouter} from "@/router";
 import {login} from "@/api/login";
 import {goToLink} from "@/utils/public";
-import {SystemStatusCode} from "@/utils/constant";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
 
