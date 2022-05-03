@@ -1,3 +1,7 @@
 export const SystemStatusCode = {
   SUCCESS: 100000,
+  FAIL: -200000,
+  USERNAME_EXIST_ALREADY: -300000,
+  ARTICLE_HAS_SHARED_ALREADY: -500000,
+
 }

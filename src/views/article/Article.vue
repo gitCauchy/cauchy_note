@@ -132,8 +132,8 @@ export default {
         ],
         isRevisableSelectValue: '',
         isRevisableOptions: [
-          {value: 1, label: '是'},
-          {value: 0, label: '否'}
+          {value: 0, label: '是'},
+          {value: 1, label: '否'}
         ],
       },
       rules: {
@@ -287,8 +287,7 @@ export default {
           addArticleShare(JSON.parse(sessionStorage.userInfo).id, this.shareForm.friendSelectValue, this.article.id,
             this.shareForm.validDaySelectValue, this.shareForm.isRevisableSelectValue)
             .then(response => {
-              if (response === SystemStatusCode.SUCCESS )
-              {
+              if (response === SystemStatusCode.SUCCESS) {
                 addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.shareForm.friendSelectValue, 1,
                   "收到了好友的分享", 0)
                   .then(response => {
@@ -300,6 +299,10 @@ export default {
                       this.shareDialogVisible = false;
                     }
                   })
+              } else if (response === SystemStatusCode.ARTICLE_HAS_SHARED_ALREADY) {
+                this.$message.info("已经存在同一用户有效期限内的分享!");
+              } else {
+                this.$message.error("分享失败!");
               }
             })
         }

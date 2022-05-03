@@ -135,8 +135,8 @@ export default {
         ],
         isRevisableSelectValue: '',
         isRevisableOptions: [
-          {value: 1, label: '是'},
-          {value: 0, label: '否'}],
+          {value: 0, label: '是'},
+          {value: 1, label: '否'}],
       },
       friendRequestList: null,
       rules: {
@@ -258,10 +258,10 @@ export default {
                     this.$message.info("好友请求发送成功，消息推送失败！")
                   }
                 })
-            } else if(response === -400002){
+            } else if (response === -400002) {
               this.$message.info("该用户已添加为好友");
               this.searchDialogVisible = false;
-            }else{
+            } else {
               this.$message.error("请求错误！")
               this.searchDialogVisible = false;
             }
@@ -290,7 +290,10 @@ export default {
                       this.shareDialogVisible = false;
                     }
                   })
-
+              } else if (response === SystemStatusCode.ARTICLE_HAS_SHARED_ALREADY) {
+                this.$message("已经存在同一用户有效期限内的分享!");
+              } else {
+                this.$message("分享失败!");
               }
             })
         }
