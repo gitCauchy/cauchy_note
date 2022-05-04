@@ -132,6 +132,7 @@ export default {
           {value: 3, label: '3 天'},
           {value: 7, label: '7 天'},
           {value: 30, label: '30 天'},
+          {value: 180, label: '180 天'}
         ],
         isRevisableSelectValue: '',
         isRevisableOptions: [
