@@ -3,7 +3,7 @@
     <el-col :span="8" style="margin-top: 20px">
       <el-card shadow="hover">
         <div class="user">
-          <img src="../../assets/img/user.jpg" alt="用户头像"/>
+          <img src="../../assets/img/user_man.jpg" alt="用户头像"/>
           <div class="userinfo">
             <p class="name">{{ username }}</p>
           </div>

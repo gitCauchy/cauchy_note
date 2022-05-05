@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="userInfoForm" status-icon :rules="rules" ref="userInfoForm" label-width="100px" style="width: 55%"
+    <el-form :model="userInfoForm" status-icon :rules="rules" ref="userInfoForm" label-width="100px" style="width: 70%"
              class="modify-password-ruleForm">
       <h3>用户基本信息</h3>
       <el-form-item label="用户名">
@@ -9,6 +9,26 @@
       <el-form-item label="电子邮箱">
         <el-input type="text" v-model="email" readonly/>
       </el-form-item>
+      <el-form-item label="性别">
+        <el-select v-model="gender" placeholder="请选择性别">
+          <el-option
+            v-for="item in genderOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="电话">
+        <el-input type="text" v-model="telephone"></el-input>
+      </el-form-item>
+      <el-form-item label="地址">
+        <el-cascader :options="addressOptions" v-model="addressSelectedOptions" @change="handleChange"></el-cascader>
+      </el-form-item>
+      <el-form-item label="生日">
+        <el-date-picker v-model="birthday" type="date" placeholder="选择出生日期"></el-date-picker>
+      </el-form-item>
+
       <br>
       <br>
       <h3>密码修改</h3>
@@ -33,6 +53,7 @@
 <script>
 import {modifyPassword} from "@/api/userinfo";
 import {SystemStatusCode} from "@/common/const";
+import {regionData, CodeToText} from "element-china-area-data";
 
 export default {
   name: "UserInfo",
@@ -58,6 +79,18 @@ export default {
       }
     };
     return {
+      genderOptions: [{
+        value: '1',
+        label: '男'
+      }, {
+        value: '0',
+        label: '女'
+      }],
+      gender:'',
+      telephone: '',
+      birthday: '',
+      addressOptions: regionData,
+      addressSelectedOptions: [],
       username: JSON.parse(sessionStorage.userInfo).username,
       email: JSON.parse(sessionStorage.userInfo).email,
       userInfoForm: {
@@ -76,6 +109,13 @@ export default {
     };
   },
   methods: {
+    handleChange() {
+      let loc = "";
+      for (let i = 0; i < this.addressSelectedOptions.length; i++) {
+        loc += CodeToText[this.addressSelectedOptions[i]];
+      }
+      alert(loc);
+    },
     modifyPasswrod() {
       this.$refs['userInfoForm'].validate((valid) => {
         if (!valid) {

@@ -10,10 +10,10 @@
     <div class="r-content">
       <el-dropdown trigger="click" size="mini">
         <span class="el-dropdown-link" v-if="this.hasNewMessage">
-          <img src="../assets/img/user_message.jpg" class="user" alt="UserImg"/>
+          <img src="../assets/img/user_man_message.jpg" class="user" alt="UserImg"/>
         </span>
         <span class="el-dropdown-link" v-else>
-          <img src="../assets/img/user.jpg" class="user" alt="UserImg"/>
+          <img src="../assets/img/user_man.jpg" class="user" alt="UserImg"/>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item @click.native="goToLink('/message')">消息
