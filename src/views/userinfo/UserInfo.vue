@@ -28,7 +28,6 @@
       <el-form-item label="生日">
         <el-date-picker v-model="birthday" type="date" placeholder="选择出生日期"></el-date-picker>
       </el-form-item>
-
       <br>
       <br>
       <h3>密码修改</h3>
@@ -79,6 +78,7 @@ export default {
       }
     };
     return {
+      imgSavePath:'',
       genderOptions: [{
         value: '1',
         label: '男'
@@ -86,7 +86,7 @@ export default {
         value: '0',
         label: '女'
       }],
-      gender:'',
+      gender: '',
       telephone: '',
       birthday: '',
       addressOptions: regionData,
@@ -109,6 +109,20 @@ export default {
     };
   },
   methods: {
+    fileChange(e) {
+      try {
+        const fu = document.getElementById('file')
+        if (fu == null) return
+        this.form.imgSavePath = fu.files[0].path
+        console.log(fu.files[0].path)
+      } catch (error) {
+        console.debug('choice file err:', error)
+      }
+    },
+    btnChange() {
+      var file = document.getElementById('file')
+      file.click()
+    },
     handleChange() {
       let loc = "";
       for (let i = 0; i < this.addressSelectedOptions.length; i++) {
