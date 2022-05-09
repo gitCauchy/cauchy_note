@@ -37,6 +37,10 @@
                 <el-button type="primary" icon="el-icon-share"
                            @click="handleShare(scope.$index,scope.row)"></el-button>
               </el-tooltip>
+              <el-tooltip effect="dark" content="导出" placement="top">
+                <el-button type="primary" icon="el-icon-download"
+                           @click="exportArticle(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
               <el-tooltip effect="dark" content="删除" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
                            @click="handleDelete(scope.$index, scope.row)"></el-button>
@@ -106,13 +110,12 @@
 </template>
 
 <script>
-import {deleteArticle, modifyArticle, addArticle, getArticleList} from "@/api/article";
+import {deleteArticle, modifyArticle, addArticle, getArticleList, exportWord} from "@/api/article";
 import {addArticleShare} from "@/api/share";
 import {getFriendList} from "@/api/friend";
 import WangEditor from "@/components/wangeditor";
 import {addNewMessage} from "@/api/message";
 import {SystemStatusCode} from "@/common/const";
-
 
 export default {
   name: "Article",
@@ -307,6 +310,16 @@ export default {
             })
         }
       })
+    },
+    exportArticle(index, row) {
+      exportWord(row.id)
+        .then((response) => {
+          const blob = new Blob([response]);
+          let a = document.createElement('a')
+          a.href = URL.createObjectURL(blob)
+          a.download = row.title + ".doc";
+          a.click();
+        });
     }
   }
 }

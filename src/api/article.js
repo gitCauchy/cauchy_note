@@ -46,3 +46,14 @@ export function addArticle(title, content, authorId) {
     }
   })
 }
+
+export function exportWord(id) {
+  return request({
+    url: '/article/exportArticle/',
+    method: 'get',
+    params:{
+      id
+    },
+    responseType: 'blob',
+  })
+}
