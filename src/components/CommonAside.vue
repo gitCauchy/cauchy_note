@@ -1,8 +1,6 @@
 <template>
   <el-menu
     class="el-menu"
-    @open="handleOpen"
-    @close="handleClose"
     :collapse="isCollapse"
     background-color="#545c64"
     text-color="#fff"
@@ -15,28 +13,30 @@
       <i :class="item.icon"></i>
       <span slot="title">{{ item.label }}</span>
     </el-menu-item>
+    <el-submenu index="item.path" v-for="item in hasChildren" :key="item.path">
+      <template slot="title">
+        <i :class="item.icon"></i>
+        <span slot="title">{{ item.label }}</span>
+      </template>
+      <el-menu-item-group v-for="subItem in item.children" :key="subItem.path">
+        <el-menu-item :index="subItem.path" @click="clickMenu(subItem)">{{ subItem.label }}</el-menu-item>
+      </el-menu-item-group>
+    </el-submenu>
   </el-menu>
 
 
 </template>
 
 <script>
-import {mapState} from 'vuex'
 
 export default {
   name: "CommonAside",
   data() {
     return {
-      menuList: []
+      menu: [],
     };
   },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
-    },
     clickMenu(item) {
       this.$router.push({name: item.name})
       this.$store.commit("selectMenu", item)
@@ -44,20 +44,18 @@ export default {
   },
   computed: {
     noChildren() {
-      return this.menuList.filter((item) => !item.children)
+      return this.asyncMenu.filter((item) => !item.children)
     },
     hasChildren() {
-      return this.menuList.filter((item) => item.children)
+      return this.asyncMenu.filter((item) => item.children)
     },
     isCollapse() {
       return this.$store.state.isCollapse
     },
-    ...mapState(['userMenuList'])
+    asyncMenu(){
+      return this.$store.state.menu;
+    },
   },
-  created() {
-    // 初始化 menuList
-    this.menuList = this.userMenuList;
-  }
 }
 </script>
 

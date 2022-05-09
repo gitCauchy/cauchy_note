@@ -16,5 +16,8 @@ new Vue({
   store,
   render: function (h) {
     return h(App)
+  },
+  created() {
+    this.$store.commit('addMenu', this.$router);
   }
 }).$mount('#app')

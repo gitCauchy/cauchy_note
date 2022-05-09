@@ -6,14 +6,9 @@
 
 <script>
 
-import {initDynamicRouter} from "./router";
-
 export default {
   name: 'App',
   components: {},
-  created() {
-    initDynamicRouter()
-  }
 }
 </script>
 

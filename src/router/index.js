@@ -1,12 +1,9 @@
-
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from "../views/login/Login";
 import Register from "../views/login/Register";
 import ResetPassword from "../views/login/ResetPassword";
 import Main from "../views/Main";
-import store from '../store'
-import {ruleMapping} from "./dynamic-routers";
 import {checkToken} from "@/api/login";
 
 const originPush = VueRouter.prototype.push
@@ -81,16 +78,5 @@ router.beforeEach((to, from, next) => {
     }
   }
 })
-
-
-export function initDynamicRouter() {
-  const currentRoutes = router.options.routes
-  const menuList = store.state.userMenuList;
-  menuList.forEach(item => {
-    const tmp = ruleMapping[item.name]
-    currentRoutes[4].children.push(tmp)
-  })
-  router.addRoutes(currentRoutes)
-}
 
 export default router

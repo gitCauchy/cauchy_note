@@ -18,7 +18,7 @@ const state = {
       icon: 'home'
     }
   ],
-  userMenuList: JSON.parse(sessionStorage.getItem("userMenuList") || '[]')
+  menu:[]
 }
 export default new Vuex.Store({
   state,

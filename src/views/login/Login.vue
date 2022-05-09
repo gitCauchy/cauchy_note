@@ -59,8 +59,9 @@ export default {
               sessionStorage.setItem("userInfo", JSON.stringify(response.userInfo));
               sessionStorage.setItem("token", response.token);
               sessionStorage.setItem("username", this.loginForm.username);
-              this.$store.commit("setMenuList", response.userInfo.menus)
-              initDynamicRouter()
+              this.$store.commit('clearMenu');
+              this.$store.commit('setMenu', response.userInfo.menus);
+              this.$store.commit('addMenu',this.$router)
               this.$router.push("/home")
             } else {
               this.$message.error("用户名或密码错误")
