@@ -186,7 +186,6 @@ export default {
         .then(response => {
           this.roleList = response.roles;
         })
-
     },
     handleDelete(row) {
       this.$confirm('是否删除该用户？', '提示',

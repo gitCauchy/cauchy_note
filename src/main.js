@@ -6,7 +6,6 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css'; // element-ui 的 css
 import './assets/css/base.css';
 
-
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false

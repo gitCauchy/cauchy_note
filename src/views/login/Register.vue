@@ -33,7 +33,7 @@ import {goToLink} from "@/utils/public";
 import {register} from "@/api/login";
 
 export default {
-  name: "login",
+  name: "Register",
   data() {
     const validUserName = (rule, value, callback) => {
       if (value) {
@@ -82,7 +82,7 @@ export default {
               if (response === SystemStatusCode.SUCCESS) {
                 this.$message.success("注册成功！跳转至登录页面... ...")
                 this.$router.push('/login')
-              } else if (response === -300000) {
+              } else if (response === SystemStatusCode.USERNAME_EXIST_ALREADY) {
                 this.$message.error("用户已存在！")
               }
             })

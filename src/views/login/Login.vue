@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import {initDynamicRouter} from "@/router";
 import {login} from "@/api/login";
 import {goToLink} from "@/utils/public";
 import {SystemStatusCode} from "@/common/const";
@@ -54,19 +53,20 @@ export default {
         if (!valid) {
           this.$message.error("请输入用户名密码");
         } else {
-          login(this.loginForm.username, this.loginForm.password).then(response => {
-            if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
-              sessionStorage.setItem("userInfo", JSON.stringify(response.userInfo));
-              sessionStorage.setItem("token", response.token);
-              sessionStorage.setItem("username", this.loginForm.username);
-              this.$store.commit('clearMenu');
-              this.$store.commit('setMenu', response.userInfo.menus);
-              this.$store.commit('addMenu',this.$router)
-              this.$router.push("/home")
-            } else {
-              this.$message.error("用户名或密码错误")
-            }
-          })
+          login(this.loginForm.username, this.loginForm.password)
+            .then(response => {
+              if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
+                sessionStorage.setItem("userInfo", JSON.stringify(response.userInfo));
+                sessionStorage.setItem("token", response.token);
+                sessionStorage.setItem("username", this.loginForm.username);
+                this.$store.commit('clearMenu');
+                this.$store.commit('setMenu', response.userInfo.menus);
+                this.$store.commit('addMenu', this.$router)
+                this.$router.push("/home")
+              } else {
+                this.$message.error("用户名或密码错误")
+              }
+            })
         }
       })
     },
