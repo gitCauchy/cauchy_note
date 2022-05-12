@@ -57,6 +57,7 @@ export default {
             .then(response => {
               if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
                 sessionStorage.setItem("userInfo", JSON.stringify(response.userInfo));
+                sessionStorage.setItem("profile", JSON.stringify(response.profile));
                 sessionStorage.setItem("token", response.token);
                 sessionStorage.setItem("username", this.loginForm.username);
                 this.$store.commit('clearMenu');

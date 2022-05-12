@@ -11,3 +11,18 @@ export function modifyPassword(username, oldPassword, newPassword) {
     }
   })
 }
+
+export function saveProfile(userId, nickName, gender, telephone, address, birthday) {
+  return request({
+    url: '/profile/modifyProfile',
+    method: 'post',
+    data: {
+      userId,
+      nickName,
+      gender,
+      telephone,
+      address,
+      birthday,
+    }
+  })
+}
