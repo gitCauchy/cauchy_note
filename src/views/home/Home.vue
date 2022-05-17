@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import * as echars from 'echarts'
+import * as echarts from 'echarts';
 import {formatDate, formatTime} from "@/utils/date";
 import {getTableData, getCountData, getTrendData} from "@/api/home";
 
@@ -156,7 +156,7 @@ export default {
           },
           series
         }
-        const E = echars.init(this.$refs.echarts)
+        const E = echarts.init(this.$refs.echarts)
         E.setOption(option)
       })
   },
