@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import {modifyPassword, saveProfile} from "@/api/userinfo";
+import {getProfile, modifyPassword, saveProfile} from "@/api/userinfo";
 import {SystemStatusCode} from "@/common/const";
 import {regionData, CodeToText} from "element-china-area-data";
 
@@ -105,19 +105,19 @@ export default {
     return {
       userId: JSON.parse(sessionStorage.userInfo).id,
       userProfileForm: {
-        nickName: JSON.parse(sessionStorage.profile).nickName,
+        nickName: '',
         genderOptions: [{
-          value: 1,
+          value: 0,
           label: '男'
         }, {
-          value: 0,
+          value: 1,
           label: '女'
         }],
-        gender: JSON.parse(sessionStorage.profile).gender,
-        telephone: JSON.parse(sessionStorage.profile).telephone,
-        birthday: JSON.parse(sessionStorage.profile).birthday,
+        gender: null,
+        telephone: null,
+        birthday: null,
         addressOptions: regionData,
-        addressSelectedOptions: JSON.parse(sessionStorage.profile).address.split(","),
+        addressSelectedOptions: null,
         username: JSON.parse(sessionStorage.userInfo).username,
         email: JSON.parse(sessionStorage.userInfo).email,
       },
@@ -144,7 +144,6 @@ export default {
   methods: {
     saveProfile() {
       this.$refs['userProfileForm'].validate((valid) => {
-        console.log(valid);
         if (!valid) {
           this.$message.error("手机号码错误！")
         } else {
@@ -157,6 +156,7 @@ export default {
             this.userProfileForm.birthday,
           ).then(response => {
             if (response === SystemStatusCode.SUCCESS) {
+              sessionStorage.setItem("gender",this.userProfileForm.gender)
               this.$message.success("保存成功!");
             } else {
               this.$message.error("保存失败！");
@@ -189,7 +189,20 @@ export default {
     },
     resetForm() {
       this.$refs['userPasswordForm'].resetFields();
+    },
+    getProfile() {
+      getProfile(JSON.parse(sessionStorage.userInfo).id)
+        .then(response => {
+          this.userProfileForm.gender = response.gender;
+          this.userProfileForm.nickName = response.nickName;
+          this.userProfileForm.telephone = response.telephone;
+          this.userProfileForm.addressSelectedOptions = response.address.split(",");
+          this.userProfileForm.birthday = response.birthday;
+        })
     }
+  },
+  created() {
+    this.getProfile();
   }
 }
 </script>

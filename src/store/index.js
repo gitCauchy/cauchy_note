@@ -18,7 +18,7 @@ const state = {
       icon: 'home'
     }
   ],
-  menu:[]
+  menu: []
 }
 export default new Vuex.Store({
   state,

@@ -10,10 +10,12 @@
     <div class="r-content">
       <el-dropdown trigger="click" size="mini">
         <span class="el-dropdown-link" v-if="this.hasNewMessage">
-          <img src="../assets/img/user_man_message.jpg" class="user" alt="UserImg"/>
+          <img src="../assets/img/user_man_message.jpg" class="user" alt="UserImg" v-if="this.gender===0"/>
+          <img src="../assets/img/user_woman_message.jpg" class="user" alt="UserImg" v-else/>
         </span>
         <span class="el-dropdown-link" v-else>
-          <img src="../assets/img/user_man.jpg" class="user" alt="UserImg"/>
+          <img src="../assets/img/user_man.jpg" class="user" alt="UserImg" v-if="this.gender===0"/>
+          <img src="../assets/img/user_woman.jpg" class="user" alt="UserImg" v-else/>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item @click.native="goToLink('/message')">消息
@@ -37,6 +39,7 @@ export default {
   data() {
     return {
       hasNewMessage: false,
+      gender: null,
     };
   },
   methods: {
@@ -58,21 +61,25 @@ export default {
       getMessageCount(JSON.parse(sessionStorage.userInfo).id).then(response => {
         this.hasNewMessage = response !== 0;
       })
-    }
+    },
   },
   created() {
     this.getMessageCount();
+    // this.gender = Number(sessionStorage.getItem("gender"))
+    this.gender = this.$store.state.userGender;
+    // console.log(sessionStorage.getItem("gender"));
+    console.log(this.gender);
   },
   computed: {
     ...mapState({
       current: (state) => state.currentMenu,
     }),
-    messageRefreshStatus(){
+    messageRefreshStatus() {
       return this.$store.state.messageStatus;
-    }
+    },
   },
-  watch:{
-    messageRefreshStatus(){
+  watch: {
+    messageRefreshStatus() {
       this.getMessageCount();
     }
   }

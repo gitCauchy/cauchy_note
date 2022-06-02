@@ -3,9 +3,10 @@
     <el-col :span="8" style="margin-top: 20px">
       <el-card shadow="hover">
         <div class="user">
-          <img src="../../assets/img/user_man.jpg" alt="用户头像"/>
+          <img v-if="gender===0" src="../../assets/img/user_man.jpg" alt="用户头像"/>
+          <img v-if="gender===1" src="../../assets/img/user_woman.jpg" alt="用户头像"/>
           <div class="userinfo">
-            <p class="name">{{ username }}</p>
+            <p class="name">{{ displayName }}</p>
           </div>
         </div>
         <div class="login-info">
@@ -56,7 +57,9 @@ export default {
   data() {
     return {
       date: new Date(),
-      username: JSON.parse(sessionStorage.userInfo).username,
+      displayName: JSON.parse(sessionStorage.profile).nickName === "" ?
+        JSON.parse(sessionStorage.userInfo).username : JSON.parse(sessionStorage.profile).nickName,
+      gender: null,
       tableData: null,
       tableLabel: {
         name: '用户',
@@ -110,8 +113,7 @@ export default {
     formatTime: formatTime
   },
   created() {
-    const current = new Date()
-    this.current_time = current.toLocaleTimeString()
+    this.gender = Number(sessionStorage.getItem("gender"));
   },
   mounted() {
     let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致

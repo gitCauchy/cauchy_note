@@ -26,3 +26,13 @@ export function saveProfile(userId, nickName, gender, telephone, address, birthd
     }
   })
 }
+
+export function getProfile(userId) {
+  return request({
+    url: '/profile/getProfile',
+    method: 'get',
+    params: {
+      userId
+    }
+  })
+}
