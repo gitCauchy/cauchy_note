@@ -65,7 +65,8 @@ export default {
   },
   created() {
     this.getMessageCount();
-    this.gender = Number(sessionStorage.getItem("gender"))
+    let gender_session = sessionStorage.getItem("gender");
+    this.gender = gender_session === "null" ? 0 : Number(sessionStorage.getItem("gender"));
   },
   computed: {
     ...mapState({

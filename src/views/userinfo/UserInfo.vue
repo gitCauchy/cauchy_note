@@ -156,7 +156,7 @@ export default {
             this.userProfileForm.birthday,
           ).then(response => {
             if (response === SystemStatusCode.SUCCESS) {
-              sessionStorage.setItem("gender",this.userProfileForm.gender)
+              sessionStorage.setItem("gender", this.userProfileForm.gender)
               this.$message.success("保存成功!");
             } else {
               this.$message.error("保存失败！");
@@ -196,7 +196,7 @@ export default {
           this.userProfileForm.gender = response.gender;
           this.userProfileForm.nickName = response.nickName;
           this.userProfileForm.telephone = response.telephone;
-          this.userProfileForm.addressSelectedOptions = response.address.split(",");
+          this.userProfileForm.addressSelectedOptions = response.address === null ? "" : response.address.split(",");
           this.userProfileForm.birthday = response.birthday;
         })
     }

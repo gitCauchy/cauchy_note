@@ -60,7 +60,6 @@ export default {
                 sessionStorage.setItem("profile", JSON.stringify(response.profile));
                 sessionStorage.setItem("token", response.token);
                 sessionStorage.setItem("username", this.loginForm.username);
-                this.$store.commit("setUserGender",response.profile.gender);
                 sessionStorage.setItem("gender", response.profile.gender);
                 this.$store.commit('clearMenu');
                 this.$store.commit('setMenu', response.userInfo.menus);

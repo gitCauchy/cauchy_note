@@ -3,7 +3,7 @@
     <el-col :span="8" style="margin-top: 20px">
       <el-card shadow="hover">
         <div class="user">
-          <img v-if="gender===0" src="../../assets/img/user_man.jpg" alt="用户头像"/>
+          <img v-if="gender===0 || gender===null" src="../../assets/img/user_man.jpg" alt="用户头像"/>
           <img v-if="gender===1" src="../../assets/img/user_woman.jpg" alt="用户头像"/>
           <div class="userinfo">
             <p class="name">{{ displayName }}</p>
@@ -113,7 +113,8 @@ export default {
     formatTime: formatTime
   },
   created() {
-    this.gender = Number(sessionStorage.getItem("gender"));
+    let gender_session = sessionStorage.getItem("gender");
+    this.gender = gender_session === "null" ? 0 : Number(sessionStorage.getItem("gender"));
   },
   mounted() {
     let _this = this; // 声明一个变量指向Vue实例this，保证作用域一致
