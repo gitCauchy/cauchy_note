@@ -65,10 +65,7 @@ export default {
   },
   created() {
     this.getMessageCount();
-    // this.gender = Number(sessionStorage.getItem("gender"))
-    this.gender = this.$store.state.userGender;
-    // console.log(sessionStorage.getItem("gender"));
-    console.log(this.gender);
+    this.gender = Number(sessionStorage.getItem("gender"))
   },
   computed: {
     ...mapState({
