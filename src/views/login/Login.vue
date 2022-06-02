@@ -61,6 +61,7 @@ export default {
                 sessionStorage.setItem("token", response.token);
                 sessionStorage.setItem("username", this.loginForm.username);
                 sessionStorage.setItem("gender", response.profile.gender);
+                sessionStorage.setItem("nickName",response.profile.nickName);
                 this.$store.commit('clearMenu');
                 this.$store.commit('setMenu', response.userInfo.menus);
                 this.$store.commit('addMenu', this.$router)

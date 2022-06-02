@@ -31,6 +31,7 @@
 <script>
 import {goToLink} from "@/utils/public";
 import {register} from "@/api/login";
+import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "Register",

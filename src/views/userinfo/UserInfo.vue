@@ -156,7 +156,8 @@ export default {
             this.userProfileForm.birthday,
           ).then(response => {
             if (response === SystemStatusCode.SUCCESS) {
-              sessionStorage.setItem("gender", this.userProfileForm.gender)
+              sessionStorage.setItem("gender", this.userProfileForm.gender);
+              sessionStorage.setItem("nickName",this.userProfileForm.nickName);
               this.$message.success("保存成功!");
             } else {
               this.$message.error("保存失败！");
