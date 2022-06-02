@@ -29,10 +29,16 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-tooltip effect="dark" content="编辑" placement="top">
-              <el-button type="primary" :icon="scope.row.isRevisable ===0?'el-icon-edit':'el-icon-tickets'"
-                         @click="handleUpdate(scope.$index,scope.row)"></el-button>
-            </el-tooltip>
+            <el-button-group>
+              <el-tooltip effect="dark" content="编辑" placement="top">
+                <el-button type="primary" :icon="scope.row.isRevisable ===0?'el-icon-edit':'el-icon-tickets'"
+                           @click="handleUpdate(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="导出" placement="top">
+                <el-button type="primary" icon="el-icon-download"
+                           @click="exportArticle(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
+            </el-button-group>
           </template>
         </el-table-column>
       </el-table>
@@ -69,7 +75,7 @@
 </template>
 
 <script>
-import {modifyArticle} from "@/api/article";
+import {exportWord, modifyArticle} from "@/api/article";
 import {getSharedArticleList} from "@/api/share";
 import WangEditor from "@/components/wangeditor";
 import {SystemStatusCode} from "@/common/const";
@@ -97,6 +103,16 @@ export default {
     this.getList();
   },
   methods: {
+    exportArticle(index, row) {
+      exportWord(row.id)
+        .then((response) => {
+          const blob = new Blob([response]);
+          let a = document.createElement('a')
+          a.href = URL.createObjectURL(blob)
+          a.download = row.title + ".doc";
+          a.click();
+        });
+    },
     closeDialog() {
       this.$refs.textEditor.editor.clear();
     },
@@ -141,10 +157,10 @@ export default {
     handleDialogConfirm() {
       modifyArticle(this.article.id, this.article.title, this.article.content)
         .then(response => {
-          if(response === SystemStatusCode.SUCCESS){
+          if (response === SystemStatusCode.SUCCESS) {
             this.$message.success("修改成功！");
             this.getList();
-          }else{
+          } else {
             this.$message.error("修改失败！")
           }
           this.dialogVisible = false;

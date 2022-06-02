@@ -168,8 +168,8 @@ export default {
     },
     handleChange() {
       let loc = "";
-      for (let i = 0; i < this.addressSelectedOptions.length; i++) {
-        loc += CodeToText[this.addressSelectedOptions[i]];
+      for (let i = 0; i < this.userProfileForm.addressSelectedOptions.length; i++) {
+        loc += CodeToText[this.userProfileForm.addressSelectedOptions[i]];
       }
     },
     modifyPassword() {
