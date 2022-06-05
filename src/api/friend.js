@@ -75,3 +75,15 @@ export function deleteFriendRequest(userId, friendId) {
     }
   })
 }
+
+export function setRemarkName(userId, friendId, remarkName) {
+  return request({
+    url: '/friend/setRemarkName',
+    method: 'get',
+    params: {
+      userId,
+      friendId,
+      remarkName,
+    }
+  })
+}

@@ -16,24 +16,29 @@
       <el-table ref="userTable" :data="friendList" v-loading="listLoading" style="width:100%" border stripe>
         <el-table-column label="#" align="center" type="index"></el-table-column>
         <el-table-column label="好友" align="center">
-          <template slot-scope="scope">{{ scope.row.username }}</template>
+          <span slot-scope="scope" v-if="scope.row.remarkName !=null">{{ scope.row.remarkName }}</span>
+          <span slot-scope="scope" v-else>{{ scope.row.username }}</span>
         </el-table-column>
         <el-table-column label="邮箱" align="center">
-          <template slot-scope="scope">{{ scope.row.email }}</template>
+          <span slot-scope="scope">{{ scope.row.email }}</span>
         </el-table-column>
         <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
+          <span slot-scope="scope">
             <el-button-group>
               <el-tooltip effect="dark" content="分享" placement="top">
                 <el-button type="primary" icon="el-icon-share"
                            @click="handleShare(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="设置备注" placement="top">
+                <el-button type="primary" icon="el-icon-user"
+                           @click="setRemarkName(scope.$index,scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip effect="dark" content="删除" placement="top">
                 <el-button type="danger" icon="el-icon-delete"
                            @click="handleDelete(scope.$index,scope.row)"></el-button>
               </el-tooltip>
             </el-button-group>
-          </template>
+          </span>
         </el-table-column>
       </el-table>
     </div>
@@ -88,6 +93,17 @@
         <el-button type="primary" @click="handleShareDialogConfirm" size="small">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="修改备注" :visible.sync="remarkDialogVisible" :fullscreen=false>
+      <el-form ref="remarkForm" label-width="100px">
+        <el-form-item label="好友备注:">
+          <el-input type="text" v-model="friend.remarkName"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel('remarkDialog')" size="small">取 消</el-button>
+        <el-button type="primary" @click="setRemarkNameConfirm" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
     <el-dialog title="好友请求列表" :visible.sync="friendRequestDialogVisible" :fullscreen=false>
       <el-table :data="friendRequestList" border style="width: 100%">
         <el-table-column label="#" align="center" type="index"></el-table-column>
@@ -110,9 +126,9 @@ import {
   getFriendList,
   deleteFriend,
   searchFriend,
-  addFriend,
   addFriendRequest,
-  getFriendRequestList, getFriendRequestResult
+  getFriendRequestList,
+  setRemarkName
 } from "@/api/friend";
 import {getArticleList} from "@/api/article";
 import {addArticleShare} from "@/api/share";
@@ -147,6 +163,7 @@ export default {
       },
       shareDialogVisible: false,
       friendRequestDialogVisible: false,
+      remarkDialogVisible: false,
       queryInfo: {
         pageNum: 1,
         pageSize: 5,
@@ -226,8 +243,10 @@ export default {
     handleCancel(dialog) {
       if (dialog === 'searchDialog') {
         this.searchDialogVisible = false;
-      } else {
+      } else if(dialog === 'shareDialog') {
         this.shareDialogVisible = false;
+      }else{
+        this.remarkDialogVisible = false;
       }
     },
     searchFriend() {
@@ -259,7 +278,7 @@ export default {
                     this.$message.info("好友请求发送成功，消息推送失败！")
                   }
                 })
-            } else if (response === -400002) {
+            } else if (response === SystemStatusCode.USER_IS_FRIEND_ALREADY) {
               this.$message.info("该用户已添加为好友");
               this.searchDialogVisible = false;
             } else {
@@ -304,6 +323,25 @@ export default {
       this.friendRequestDialogVisible = true;
       this.getFriendRequestList();
     },
+    setRemarkName(index,row) {
+      this.remarkDialogVisible = true;
+      this.friend = Object.assign({}, row);
+      console.log(this.friend);
+    },
+    setRemarkNameConfirm() {
+      setRemarkName(JSON.parse(sessionStorage.userInfo).id,
+        this.friend.friendId,
+        this.friend.remarkName
+      )
+        .then(response => {
+          if (response === SystemStatusCode.SUCCESS) {
+            this.$message.success("添加成功！")
+          }else{
+            this.$message.error("失败！");
+          }
+
+        })
+    }
   }
 }
 </script>
