@@ -178,7 +178,7 @@ export default {
         email: null
       },
       searchDialogVisible: false,
-      friendName: null,
+      friendName: '',
       isNull: false
     }
   },
@@ -253,6 +253,7 @@ export default {
       this.searchDialogVisible = true;
       searchFriend(this.friendName)
         .then(response => {
+          console.log(response);
           this.searchResult = response;
           if (this.searchResult.id != null) {
             this.isNull = true;
@@ -294,13 +295,13 @@ export default {
           this.$message.error("请选择提示内容!");
         } else {
           addArticleShare(JSON.parse(sessionStorage.userInfo).id,
-            this.friend.id,
+            this.friend.friendId,
             this.shareForm.articleSelectValue,
             this.shareForm.validDaySelectValue,
             this.shareForm.isRevisableSelectValue)
             .then(response => {
               if (response === SystemStatusCode.SUCCESS) {
-                addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.friend.id, 1, "好友分享了笔记", 0)
+                addNewMessage(JSON.parse(sessionStorage.userInfo).id, this.friend.friendId, 1, "好友分享了笔记", 0)
                   .then(response => {
                     if (response === SystemStatusCode.SUCCESS) {
                       this.$message({
@@ -326,7 +327,6 @@ export default {
     setRemarkName(index,row) {
       this.remarkDialogVisible = true;
       this.friend = Object.assign({}, row);
-      console.log(this.friend);
     },
     setRemarkNameConfirm() {
       setRemarkName(JSON.parse(sessionStorage.userInfo).id,
@@ -337,6 +337,7 @@ export default {
           if (response === SystemStatusCode.SUCCESS) {
             this.$message.success("设置成功！")
             this.remarkDialogVisible =false;
+            this.getList();
           }else{
             this.$message.error("设置失败！");
             this.remarkDialogVisible = false;
