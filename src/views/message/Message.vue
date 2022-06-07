@@ -48,7 +48,7 @@ import {
   deleteUser,
 } from "@/api/admin";
 import {addNewMessage, getMessageList, readMessage} from "@/api/message";
-import {addFriend, deleteFriendRequest} from "@/api/friend";
+import {addFriend, deleteFriendRequest, setRemarkName, agreeFriendRequest, rejectFriendRequest} from "@/api/friend";
 import {SystemStatusCode} from "@/common/const";
 
 export default {
@@ -83,48 +83,23 @@ export default {
       })
     },
     handleAgreeFriendRequest(id, senderId, receiverId) {
-      addFriend(senderId, receiverId)
-        .then(response => {
-          if (response === SystemStatusCode.SUCCESS) {
-            addFriend(receiverId, senderId)
-              .then(response => {
-                if (response === SystemStatusCode.SUCCESS) {
-                  readMessage(id).then(response => {
-                    if (response === SystemStatusCode.SUCCESS) {
-                      deleteFriendRequest(senderId, receiverId)
-                        .then(response => {
-                          if (response === SystemStatusCode.SUCCESS) {
-                            this.$message.success("添加成功！");
-                            this.getList();
-                            this.refreshMessageTips();
-                          }
-                        })
-                    }
-                  })
-                }
-              })
-          }
-        })
+      agreeFriendRequest(id,senderId,receiverId)
+      .then(response=>{
+        if(response === SystemStatusCode.SUCCESS){
+          this.$message.success("添加成功！");
+          this.getList();
+          this.refreshMessageTips();
+        }
+      })
     },
     handleRejectFriendRequest(id, senderId, receiverId) {
-      deleteFriendRequest(senderId, receiverId)
-        .then(response => {
+      rejectFriendRequest(id,senderId,receiverId)
+      .then(response=>{
           if (response === SystemStatusCode.SUCCESS) {
-            addNewMessage(receiverId, senderId, 3, "您的好友请求被拒绝", 0)
-              .then(response => {
-                if (response === SystemStatusCode.SUCCESS) {
-                  readMessage(id)
-                    .then(response => {
-                      if (response === SystemStatusCode.SUCCESS) {
-                        this.getList();
-                        this.refreshMessageTips();
-                      }
-                    })
-                }
-              })
+            this.getList();
+            this.refreshMessageTips();
           }
-        })
-
+      })
     },
     refreshMessageTips() {
       let messageStatus = this.$store.state.messageStatus;

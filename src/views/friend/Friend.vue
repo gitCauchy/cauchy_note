@@ -335,9 +335,11 @@ export default {
       )
         .then(response => {
           if (response === SystemStatusCode.SUCCESS) {
-            this.$message.success("添加成功！")
+            this.$message.success("设置成功！")
+            this.remarkDialogVisible =false;
           }else{
-            this.$message.error("失败！");
+            this.$message.error("设置失败！");
+            this.remarkDialogVisible = false;
           }
 
         })

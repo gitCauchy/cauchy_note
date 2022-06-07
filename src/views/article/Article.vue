@@ -191,7 +191,10 @@ export default {
       )
         .then(response => {
           for (let i = 0; i < response.length; i++) {
-            this.shareForm.friendOptions.push({value: response[i].id, label: response[i].username})
+            this.shareForm.friendOptions.push({
+              value: response[i].id, label:
+                response[i].remarkName === null ? response[i].username : response[i].remarkName
+            })
           }
         })
 

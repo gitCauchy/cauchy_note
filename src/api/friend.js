@@ -87,3 +87,27 @@ export function setRemarkName(userId, friendId, remarkName) {
     }
   })
 }
+
+export function agreeFriendRequest(messageId, senderId, receiverId) {
+  return request({
+    url: '/friend/agreeFriendRequest',
+    method: 'get',
+    params: {
+      messageId,
+      senderId,
+      receiverId,
+    }
+  })
+}
+
+export function rejectFriendRequest(messageId, senderId, receiverId) {
+  return request({
+    url:'/friend/rejectFriendRequest',
+    method:'get',
+    params: {
+      messageId,
+      senderId,
+      receiverId,
+    }
+  })
+}
