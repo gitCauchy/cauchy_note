@@ -19,7 +19,8 @@
           <template slot-scope="scope">{{ scope.row.createTime.substr(0, 10) }}</template>
         </el-table-column>
         <el-table-column label="分享人" align="center">
-          <template slot-scope="scope">{{ scope.row.shareUsername }}</template>
+          <span slot-scope="scope" v-if="scope.row.remarkName===null">{{ scope.row.shareUsername }}</span>
+          <span slot-scope="scope" v-else>{{ scope.row.remarkName }}</span>
         </el-table-column>
         <el-table-column label="分享时间" align="center">
           <template slot-scope="scope">{{ scope.row.shareDate.substr(0, 10) }}</template>
