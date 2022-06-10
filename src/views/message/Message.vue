@@ -8,6 +8,7 @@
           <template slot-scope="scope">
             <span v-if="scope.row.messageType===0">好友验证</span>
             <span v-if="scope.row.messageType===1">笔记分享</span>
+            <span v-if="scope.row.messageType===2">站内邮件</span>
             <span v-if="scope.row.messageType===3">好友反馈</span>
           </template>
         </el-table-column>
@@ -20,10 +21,21 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button-group v-if="scope.row.messageType===1 || scope.row.messageType === 3">
+            <el-button-group
+              v-if="scope.row.messageType===1 || scope.row.messageType === 3">
               <el-tooltip effect="dark" content="标记为已读" placement="top">
                 <el-button type="primary" icon="el-icon-check"
                            @click="handleReadMessage(scope.row.id)"/>
+              </el-tooltip>
+            </el-button-group>
+            <el-button-group v-if="scope.row.messageType===2">
+              <el-tooltip effect="dark" content="标记为已读" placement="top">
+                <el-button type="primary" icon="el-icon-check"
+                           @click="handleReadMessage(scope.row.id)"/>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="消息详情" placement="top">
+                <el-button type="primary" icon="el-icon-more"
+                           @click="readMessageDetail(scope.$index,scope.row)"/>
               </el-tooltip>
             </el-button-group>
             <el-button-group v-if="scope.row.messageType===0">
@@ -40,21 +52,32 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog title="消息详情" :visible.sync="messageDialogVisible" :fullscreen=false width="30%">
+      <el-form label-position="right" label-width="100px">
+        <el-form-item label="发件人：">
+          <el-input v-model="message.senderRemarkName" style="width: 80%" readonly></el-input>
+        </el-form-item>
+        <el-form-item label="内容：">
+          <el-input type="textarea" rows="5" v-model="message.messageInfo" style="width: 80%" readonly></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel" size="small">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {
-  deleteUser,
-} from "@/api/admin";
-import {addNewMessage, getMessageList, readMessage} from "@/api/message";
-import {addFriend, deleteFriendRequest, setRemarkName, agreeFriendRequest, rejectFriendRequest} from "@/api/friend";
+import {getMessageList, readMessage} from "@/api/message";
+import {agreeFriendRequest, rejectFriendRequest} from "@/api/friend";
 import {SystemStatusCode} from "@/common/const";
 
 export default {
   name: "Message",
   data() {
     return {
+      messageDialogVisible: false,
       messageList: null,
       listLoading: false,
       message: {},
@@ -83,23 +106,31 @@ export default {
       })
     },
     handleAgreeFriendRequest(id, senderId, receiverId) {
-      agreeFriendRequest(id,senderId,receiverId)
-      .then(response=>{
-        if(response === SystemStatusCode.SUCCESS){
-          this.$message.success("添加成功！");
-          this.getList();
-          this.refreshMessageTips();
-        }
-      })
+      agreeFriendRequest(id, senderId, receiverId)
+        .then(response => {
+          if (response === SystemStatusCode.SUCCESS) {
+            this.$message.success("添加成功！");
+            this.getList();
+            this.refreshMessageTips();
+          }
+        })
     },
     handleRejectFriendRequest(id, senderId, receiverId) {
-      rejectFriendRequest(id,senderId,receiverId)
-      .then(response=>{
+      rejectFriendRequest(id, senderId, receiverId)
+        .then(response => {
           if (response === SystemStatusCode.SUCCESS) {
             this.getList();
             this.refreshMessageTips();
           }
-      })
+        })
+    },
+    readMessageDetail(index, row) {
+      this.message = Object.assign({}, row);
+      this.messageDialogVisible = true;
+      this.handleReadMessage(this.message.id);
+    },
+    handleCancel() {
+      this.messageDialogVisible = false;
     },
     refreshMessageTips() {
       let messageStatus = this.$store.state.messageStatus;

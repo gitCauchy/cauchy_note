@@ -29,6 +29,10 @@
                 <el-button type="primary" icon="el-icon-share"
                            @click="handleShare(scope.$index,scope.row)"></el-button>
               </el-tooltip>
+              <el-tooltip effect="dark" content="分享" placement="top">
+                <el-button type="primary" icon="el-icon-message" style="background-color: #b2d235"
+                           @click="sendMessage(scope.$index,scope.row)"></el-button>
+              </el-tooltip>
               <el-tooltip effect="dark" content="设置备注" placement="top">
                 <el-button type="primary" icon="el-icon-user"
                            @click="setRemarkName(scope.$index,scope.row)"></el-button>
@@ -93,6 +97,19 @@
         <el-button type="primary" @click="handleShareDialogConfirm" size="small">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog title="站内消息" :visible.sync="messageDialogVisible" :fullscreen=false width="600px">
+      <el-form ref="messageForm" label-width="50px" :model="messageForm">
+        <el-form-item label="内容:">
+          <el-input type="textarea" rows="5" v-model="messageForm.messageContent"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel('messageDialog')" size="small">取 消</el-button>
+        <el-button type="primary" @click="handleMessageDialogConfirm" size="small">确 定</el-button>
+      </span>
+    </el-dialog>
+
     <el-dialog title="修改备注" :visible.sync="remarkDialogVisible" :fullscreen=false>
       <el-form ref="remarkForm" label-width="100px">
         <el-form-item label="好友备注:">
@@ -155,6 +172,9 @@ export default {
           {value: 0, label: '是'},
           {value: 1, label: '否'}],
       },
+      messageForm: {
+        messageContent: '',
+      },
       friendRequestList: null,
       rules: {
         articleSelectValue: [{required: true, message: '请选择好友', trigger: blur}],
@@ -164,6 +184,7 @@ export default {
       shareDialogVisible: false,
       friendRequestDialogVisible: false,
       remarkDialogVisible: false,
+      messageDialogVisible: false,
       queryInfo: {
         pageNum: 1,
         pageSize: 5,
@@ -243,10 +264,12 @@ export default {
     handleCancel(dialog) {
       if (dialog === 'searchDialog') {
         this.searchDialogVisible = false;
-      } else if(dialog === 'shareDialog') {
+      } else if (dialog === 'shareDialog') {
         this.shareDialogVisible = false;
-      }else{
+      } else if (dialog === 'remarkDialog') {
         this.remarkDialogVisible = false;
+      } else {
+        this.messageDialogVisible = false;
       }
     },
     searchFriend() {
@@ -324,7 +347,7 @@ export default {
       this.friendRequestDialogVisible = true;
       this.getFriendRequestList();
     },
-    setRemarkName(index,row) {
+    setRemarkName(index, row) {
       this.remarkDialogVisible = true;
       this.friend = Object.assign({}, row);
     },
@@ -336,14 +359,35 @@ export default {
         .then(response => {
           if (response === SystemStatusCode.SUCCESS) {
             this.$message.success("设置成功！")
-            this.remarkDialogVisible =false;
+            this.remarkDialogVisible = false;
             this.getList();
-          }else{
+          } else {
             this.$message.error("设置失败！");
             this.remarkDialogVisible = false;
           }
 
         })
+    },
+    sendMessage(index, row) {
+      this.messageDialogVisible = true;
+      this.friend = Object.assign({}, row)
+    },
+    handleMessageDialogConfirm() {
+      addNewMessage(JSON.parse(sessionStorage.userInfo).id,
+        this.friend.friendId,
+        SystemStatusCode.SHORT_MESSAGE,
+        this.messageForm.messageContent,
+        0,
+      )
+      .then(response=>{
+        if(response === SystemStatusCode.SUCCESS){
+          this.$message.success("发送成功！");
+          this.messageDialogVisible = false;
+        }else{
+          this.$message.error("发送失败！");
+          this.messageDialogVisible = false;
+        }
+      })
     }
   }
 }
