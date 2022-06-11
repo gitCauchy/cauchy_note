@@ -41,6 +41,29 @@
         <el-button type="primary" @click="saveProfile">保存信息</el-button>
       </el-form-item>
     </el-form>
+    <br>
+    <h3>修改绑定邮箱</h3>
+    <el-form :model="userEmailForm" label-width="100px" ref="userEmailForm"
+             :rules="rulesEmail">
+      <el-form-item label="当前邮箱">
+        <el-input v-model="userEmailForm.email" readonly></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" :class="{codeGetting:isGeting}" :disabled="isDisabled" @click="sendCheckCode">
+          {{ getCode }}
+        </el-button>
+      </el-form-item>
+      <el-form-item label="验证码">
+        <el-input type="text" v-model="userEmailForm.checkCode" prop="checkCode"></el-input>
+      </el-form-item>
+      <el-form-item label="新邮箱">
+        <el-input type="text" v-model="userEmailForm.newEmail" prop="newEmail"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="confirmModifyEmail">确认修改</el-button>
+      </el-form-item>
+    </el-form>
+    <br>
     <h3>密码修改</h3>
     <el-form :model="userPasswordForm"
              status-icon ref="userPasswordForm"
@@ -66,9 +89,10 @@
 </template>
 
 <script>
-import {getProfile, modifyPassword, saveProfile} from "@/api/userinfo";
+import {getProfile, modifyEmail, modifyPassword, saveProfile} from "@/api/userinfo";
 import {SystemStatusCode} from "@/common/const";
 import {regionData, CodeToText} from "element-china-area-data";
+import {sendCheckCode} from "@/api/login";
 
 export default {
   name: "UserInfo",
@@ -81,8 +105,7 @@ export default {
         }
         callback();
       }
-    }
-
+    };
     const validateNewpassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'));
@@ -102,8 +125,20 @@ export default {
         callback();
       }
     };
+    const validateEmail = (rule, value, callback) => {
+      if (value) {
+        if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
+          callback(new Error("邮箱格式错误"));
+        }
+        callback();
+      }
+    };
     return {
       userId: JSON.parse(sessionStorage.userInfo).id,
+      getCode: '获取验证码',
+      count: 60,
+      isGeting: false,
+      isDisabled: false,
       userProfileForm: {
         nickName: '',
         genderOptions: [{
@@ -121,6 +156,11 @@ export default {
         username: JSON.parse(sessionStorage.userInfo).username,
         email: JSON.parse(sessionStorage.userInfo).email,
       },
+      userEmailForm: {
+        email: null,
+        checkCode: null,
+        newEmail: null,
+      },
       userPasswordForm: {
         oldPassword: '',
         newPassword: '',
@@ -130,6 +170,13 @@ export default {
         telephone: [
           {validator: validateTelephone, trigger: 'blur'},
         ],
+      },
+      rulesEmail: {
+        checkCode: [
+          {required: true, trigger: 'blur', message: '请输入验证码'},
+          {length: 6, trigger: 'blur', message: '验证码长度为 6 个字符'}
+        ],
+        newEmail: [{validator: validateEmail, trigger: 'blur'}]
       },
       rulesPassword: {
         newPassword: [
@@ -142,6 +189,46 @@ export default {
     };
   },
   methods: {
+    sendCheckCode() {
+      let countDown = setInterval(() => {
+        if (this.count < 1) {
+          this.isGeting = false
+          this.isDisabled = false
+          this.getCode = '获取验证码'
+          this.count = 6
+          clearInterval(countDown)
+        } else {
+          this.isGeting = true
+          this.isDisabled = true
+          this.getCode = this.count-- + 's后重发'
+        }
+      }, 1000);
+      sendCheckCode(this.userProfileForm.username)
+        .then(response => {
+          if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
+            this.$message.success("验证码发送成功");
+          } else {
+            this.$message.error("系统异常，请稍后再试")
+          }
+        })
+    },
+    confirmModifyEmail(){
+      this.$refs['userEmailForm'].validate((valid)=>{
+        if(!valid){
+          this.$message.error("按要求填写信息");
+        }else{
+          modifyEmail(this.userProfileForm.username,this.userEmailForm.checkCode,this.userEmailForm.newEmail)
+          .then(response=>{
+            if(response === SystemStatusCode.SUCCESS){
+              this.$message.success("修改成功");
+              this.getProfile();
+            }else {
+              this.$message.error("修改失败");
+            }
+          })
+        }
+      })
+    },
     saveProfile() {
       this.$refs['userProfileForm'].validate((valid) => {
         if (!valid) {
@@ -157,7 +244,7 @@ export default {
           ).then(response => {
             if (response === SystemStatusCode.SUCCESS) {
               sessionStorage.setItem("gender", this.userProfileForm.gender);
-              sessionStorage.setItem("nickName",this.userProfileForm.nickName);
+              sessionStorage.setItem("nickName", this.userProfileForm.nickName);
               this.$message.success("保存成功!");
             } else {
               this.$message.error("保存失败！");
@@ -199,6 +286,7 @@ export default {
           this.userProfileForm.telephone = response.telephone;
           this.userProfileForm.addressSelectedOptions = response.address === null ? "" : response.address.split(",");
           this.userProfileForm.birthday = response.birthday;
+          this.userEmailForm.email = response.email;
         })
     }
   },

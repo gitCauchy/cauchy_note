@@ -36,3 +36,15 @@ export function getProfile(userId) {
     }
   })
 }
+
+export function modifyEmail(username, checkCode, newEmail) {
+  return request({
+    url: '/user/modifyUserEmail',
+    method: 'post',
+    data: {
+      username,
+      checkCode,
+      newEmail,
+    }
+  })
+}

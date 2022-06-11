@@ -103,7 +103,7 @@ export default {
           this.isDisabled = true
           this.getCode = this.count-- + 's后重发'
         }
-      }, 1000)
+      }, 1000);
       sendCheckCode(this.resetPasswordForm.username)
         .then(response => {
           if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
