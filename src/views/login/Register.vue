@@ -47,7 +47,7 @@ export default {
 
     const validEmail = (rule, value, callback) => {
       if (value) {
-        if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
+        if (!(/^[A-Za-z0-9\u4e00-\u9fa5_]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
           callback(new Error("邮箱格式错误"));
         }
         callback();
@@ -65,26 +65,32 @@ export default {
           {min: 6, max: 14, message: '长度在6-14字符之间', trigger: "blur"}
         ],
         email: [{validator: validEmail, trigger: 'blur'}],
-        password: [{min: 6, max: 14, message: '长度在6-16字符之间', trigger: "blur"}]
       },
     };
   },
   methods: {
     doLogin() {
-      goToLink('/login')
+      goToLink('/login');
     },
     doRegister() {
       this.$refs['registerForm'].validate((valid) => {
         if (!valid) {
-          this.$message.error("输入内容不合法！")
+          this.$message.error("输入内容不合法！");
         } else {
           register(this.registerForm.username, this.registerForm.password, this.registerForm.email)
             .then(response => {
               if (response === SystemStatusCode.SUCCESS) {
-                this.$message.success("注册成功！跳转至登录页面... ...")
-                this.$router.push('/login')
-              } else if (response === SystemStatusCode.USERNAME_EXIST_ALREADY) {
-                this.$message.error("用户已存在！")
+                this.$message.success("注册成功！跳转至登录页面... ...");
+                this.$router.push('/login');
+              }
+              if (response === SystemStatusCode.USERNAME_EXIST_ALREADY) {
+                this.$message.error("用户已存在");
+              }
+              if (response === SystemStatusCode.EMAIL_REGISTERED_ALREADY) {
+                this.$message.error("邮箱已被注册");
+              }
+              if(response === SystemStatusCode.PASSWORD_ILLEGAL){
+                this.$message.error("密码过于简单");
               }
             })
         }
@@ -98,7 +104,7 @@ export default {
 .register {
   width: 100%;
   height: 100%;
-  background: url("../../assets/img/login_background.jpg") no-repeat;
+  background: url("../../assets/img/register_background.jpg") no-repeat;
   background-size: cover;
   overflow: hidden;
 }

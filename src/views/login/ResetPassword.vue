@@ -1,28 +1,29 @@
 <template>
   <div class="resetPassword-page">
     <div class="resetPassword-form">
-      <el-form :model="resetPasswordForm" style="width: 40%;display:inline-block" status-icon :rules="rules"
+      <el-form :model="resetPasswordForm" style="width: 30%;display:inline-block" status-icon :rules="rules"
                ref="resetPasswordForm"
                label-width="100px" class="resetPassword-ruleForm">
         <h3>重置密码</h3>
-        <el-form-item label="用户名">
-          <el-input v-model="resetPasswordForm.username"></el-input>
+        <el-form-item label="用户名" class="form_username">
+          <el-input v-model="resetPasswordForm.username" placeholder="请输入用户名"/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :class="{codeGetting:isGeting}" :disabled="isDisabled" @click="sendCheckCode">
             {{ getCode }}
           </el-button>
         </el-form-item>
-        <el-form-item label="验证码" prop="checkCode">
-          <el-input v-model="resetPasswordForm.checkCode"></el-input>
+        <el-form-item label="验证码" prop="checkCode" class="form_check_code">
+          <el-input v-model="resetPasswordForm.checkCode" placeholder="请输入您收到的验证码"/>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input type="password" show-password v-model="resetPasswordForm.password" autocomplete="off"></el-input>
+        <el-form-item label="密码" prop="password" class="form_password">
+          <el-input type="password" show-password v-model="resetPasswordForm.password" autocomplete="off"
+                    placeholder="请输入密码"/>
         </el-form-item>
 
-        <el-form-item label="确认密码" prop="checkPassword">
+        <el-form-item label="确认密码" prop="checkPassword" class="form_password">
           <el-input type="password" show-password v-model="resetPasswordForm.checkPassword"
-                    autocomplete="off"></el-input>
+                    autocomplete="off" placeholder="请重新输入一次密码"></el-input>
         </el-form-item>
 
         <el-form-item>
