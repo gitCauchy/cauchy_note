@@ -8,22 +8,22 @@ html, body, #app {
 
 .form_username .el-form-item__label {
   font-size: 16px;
-  color: cornflowerblue;
+  color: #409EFF;
   font-weight: 500;
 }
 
 .form_password .el-form-item__label {
   font-size: 16px;
-  color: cornflowerblue;
+  color: #409EFF;
 }
 
 .form_email .el-form-item__label {
-  color: cornflowerblue;
+  color: #409EFF;
   font-size: 16px;
 }
 
 .form_check_code .el-form-item__label {
-  color: cornflowerblue;
+  color: #409EFF;
   font-size: 16px;
 }
 

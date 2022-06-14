@@ -3,13 +3,13 @@
     <div class="resetPassword-form">
       <el-form :model="resetPasswordForm" style="width: 30%;display:inline-block" status-icon :rules="rules"
                ref="resetPasswordForm"
-               label-width="100px" class="resetPassword-ruleForm">
+               label-width="100px">
         <h3>重置密码</h3>
         <el-form-item label="用户名" class="form_username">
           <el-input v-model="resetPasswordForm.username" placeholder="请输入用户名"/>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :class="{codeGetting:isGeting}" :disabled="isDisabled" @click="sendCheckCode">
+          <el-button type="primary" :class="{codeGetting:isGetting}" :disabled="isDisabled" @click="sendCheckCode">
             {{ getCode }}
           </el-button>
         </el-form-item>
@@ -23,12 +23,13 @@
 
         <el-form-item label="确认密码" prop="checkPassword" class="form_password">
           <el-input type="password" show-password v-model="resetPasswordForm.checkPassword"
-                    autocomplete="off" placeholder="请重新输入一次密码"></el-input>
+                    autocomplete="off" placeholder="请重新输入一次密码"/>
         </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="resetPassword">重置密码</el-button>
-        </el-form-item>
+        <el-row>
+          <el-button type="primary" @click="resetPassword">确认重置</el-button>
+          <el-button type="primary" @click="doLogin">返回登录</el-button>
+        </el-row>
       </el-form>
     </div>
   </div>
@@ -37,6 +38,7 @@
 <script>
 import {sendCheckCode, resetPassword} from "@/api/login";
 import {SystemStatusCode} from "@/common/const";
+import {goToLink} from "@/utils/public";
 
 export default {
   name: "ResetPassword",
@@ -69,7 +71,7 @@ export default {
     return {
       getCode: '获取验证码',
       count: 60,
-      isGeting: false,
+      isGetting: false,
       isDisabled: false,
       resetPasswordForm: {
         password: '',
@@ -92,44 +94,55 @@ export default {
   },
   methods: {
     sendCheckCode() {
+      if ((this.resetPasswordForm.username === '') || (/[\u4E00-\u9FA5]/g.test(this.resetPasswordForm.username))) {
+        this.$message.error("请填写正确的用户名");
+        return;
+      }
       let countDown = setInterval(() => {
         if (this.count < 1) {
-          this.isGeting = false
-          this.isDisabled = false
-          this.getCode = '获取验证码'
-          this.count = 6
+          this.isGetting = false;
+          this.isDisabled = false;
+          this.getCode = '获取验证码';
+          this.count = 6;
           clearInterval(countDown)
         } else {
-          this.isGeting = true
-          this.isDisabled = true
-          this.getCode = this.count-- + 's后重发'
+          this.isGetting = true;
+          this.isDisabled = true;
+          this.getCode = this.count-- + 's后重发';
         }
       }, 1000);
       sendCheckCode(this.resetPasswordForm.username, "密码重置服务")
         .then(response => {
           if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
-            this.$message.success("验证码发送成功！")
-
+            this.$message.success("验证码已经发送到您账号注册的邮箱");
           } else {
-            this.$message.error("系统异常，请稍后再试！")
+            this.$message.error("系统异常，请稍后再试！");
           }
         })
     },
     resetPassword() {
       this.$refs['resetPasswordForm'].validate((valid) => {
         if (!valid) {
-          this.$message.error("填写有误")
+          this.$message.error("请按照提示填写");
         } else {
           resetPassword(this.resetPasswordForm.username, this.resetPasswordForm.password, this.resetPasswordForm.checkCode)
             .then(response => {
               if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
-                this.$message.success("修改成功！")
+                this.$message.success("密码重置成功,将跳转至登录页面");
+                setTimeout(() => {
+                  this.doLogin();
+                }, 100)
+              } else if (response.SystemStatusCode === SystemStatusCode.PASSWORD_ILLEGAL) {
+                this.$message.error("密码过于简单")
               } else {
-                this.$message.error("验证码错误！")
+                this.$message.error("验证码错误");
               }
             })
         }
       })
+    },
+    doLogin() {
+      goToLink('/login')
     }
   }
 }
@@ -155,7 +168,7 @@ export default {
 }
 
 h3 {
-  color: #0babeab8;
+  color: #409EFF;
   font-size: 24px;
   text-align: left;
 }
