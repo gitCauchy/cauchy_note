@@ -99,6 +99,7 @@ export default {
   data() {
 
     const validateTelephone = (rule, value, callback) => {
+      console.log(value);
       if (value) {
         if (!(/^[1][3,4,5,7,8][0-9]{9}$/.test(value))) {
           callback(new Error("电话号码格式错误"));
@@ -149,7 +150,7 @@ export default {
           label: '女'
         }],
         gender: null,
-        telephone: null,
+        telephone: '',
         birthday: null,
         addressOptions: regionData,
         addressSelectedOptions: null,
@@ -168,7 +169,8 @@ export default {
       },
       rulesProfile: {
         telephone: [
-          {validator: validateTelephone, trigger: 'blur'},
+          {validator: validateTelephone, trigger: 'blur', message: '手机号格式不正确'},
+          {required: true, trigger: 'blur', message: '必填选项'}
         ],
       },
       rulesEmail: {
@@ -203,7 +205,7 @@ export default {
           this.getCode = this.count-- + 's后重发'
         }
       }, 1000);
-      sendCheckCode(this.userProfileForm.username)
+      sendCheckCode(this.userProfileForm.username, "修改绑定邮箱")
         .then(response => {
           if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
             this.$message.success("验证码发送成功");
@@ -212,27 +214,27 @@ export default {
           }
         })
     },
-    confirmModifyEmail(){
-      this.$refs['userEmailForm'].validate((valid)=>{
-        if(!valid){
+    confirmModifyEmail() {
+      this.$refs['userEmailForm'].validate((valid) => {
+        if (!valid) {
           this.$message.error("按要求填写信息");
-        }else{
-          modifyEmail(this.userProfileForm.username,this.userEmailForm.checkCode,this.userEmailForm.newEmail)
-          .then(response=>{
-            if(response === SystemStatusCode.SUCCESS){
-              this.$message.success("修改成功");
-              this.getProfile();
-            }else {
-              this.$message.error("修改失败");
-            }
-          })
+        } else {
+          modifyEmail(this.userProfileForm.username, this.userEmailForm.checkCode, this.userEmailForm.newEmail)
+            .then(response => {
+              if (response === SystemStatusCode.SUCCESS) {
+                this.$message.success("修改成功");
+                this.getProfile();
+              } else {
+                this.$message.error("修改失败");
+              }
+            })
         }
       })
     },
     saveProfile() {
       this.$refs['userProfileForm'].validate((valid) => {
         if (!valid) {
-          this.$message.error("手机号码错误！")
+          this.$message.error("请按照提示填写！")
         } else {
           saveProfile(
             this.userId,
@@ -242,6 +244,7 @@ export default {
             this.userProfileForm.addressSelectedOptions.toString(),
             this.userProfileForm.birthday,
           ).then(response => {
+            console.log(response);
             if (response === SystemStatusCode.SUCCESS) {
               sessionStorage.setItem("gender", this.userProfileForm.gender);
               sessionStorage.setItem("nickName", this.userProfileForm.nickName);

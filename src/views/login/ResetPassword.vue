@@ -104,7 +104,7 @@ export default {
           this.getCode = this.count-- + 's后重发'
         }
       }, 1000);
-      sendCheckCode(this.resetPasswordForm.username)
+      sendCheckCode(this.resetPasswordForm.username, "密码重置服务")
         .then(response => {
           if (response.SystemStatusCode === SystemStatusCode.SUCCESS) {
             this.$message.success("验证码发送成功！")

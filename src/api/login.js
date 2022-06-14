@@ -23,12 +23,13 @@ export function register(username, password, email) {
   })
 }
 
-export function sendCheckCode(username) {
+export function sendCheckCode(username, subject) {
   return request({
     url: '/user/sendCheckCode',
     method: 'get',
     params: {
-      username
+      username,
+      subject
     }
   })
 }
