@@ -16,17 +16,20 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/login',
+    label: '登录',
     name: 'Login',
     component: Login,
   },
   {
     path: '/register',
+    label: '注册',
     name: 'Register',
     component: Register
   },
   {
     path: '/resetPassword',
     name: 'ResetPassword',
+    label: '重置密码',
     component: ResetPassword
   },
   {
@@ -36,6 +39,7 @@ const routes = [
   {
     path: '/home',
     name: 'Main',
+    label: '主页',
     component: Main,
     children: [
       {
@@ -47,6 +51,7 @@ const routes = [
   },
   {
     path: '*',
+    label: '404',
     component: () => import('../components/NotFound')
   }
 ]

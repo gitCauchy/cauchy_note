@@ -16,6 +16,10 @@ export const SystemStatusCode = {
    */
   EMAIL_REGISTERED_ALREADY: -300001,
   /**
+   * 验证码错误
+   */
+  CHECKCODE_INVALID: -300004,
+  /**
    * 密码不合法
    */
   PASSWORD_ILLEGAL: -300006,

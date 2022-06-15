@@ -105,6 +105,7 @@ export default {
   },
   methods: {
     exportArticle(index, row) {
+      console.log(row);
       exportWord(row.id)
         .then((response) => {
           const blob = new Blob([response]);

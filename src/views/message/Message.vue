@@ -127,7 +127,6 @@ export default {
     readMessageDetail(index, row) {
       this.message = Object.assign({}, row);
       this.messageDialogVisible = true;
-      this.handleReadMessage(this.message.id);
     },
     handleCancel() {
       this.messageDialogVisible = false;

@@ -5,14 +5,10 @@
              ref="userProfileForm"
              :rules="rulesProfile"
              label-width="100px"
-             style="width:70%"
-             class="user-profile-ruleForm">
+             style="width:70%">
       <h3>用户基本信息</h3>
-      <el-form-item label="用户名">
+      <el-form-item label="用户名" style="font-color: red">
         <el-input type="text" v-model="userProfileForm.username" readonly/>
-      </el-form-item>
-      <el-form-item label="电子邮箱">
-        <el-input type="text" v-model="userProfileForm.email" readonly/>
       </el-form-item>
       <el-form-item label="昵称">
         <el-input type="text" v-model="userProfileForm.nickName"/>
@@ -35,7 +31,7 @@
                      @change="handleChange"></el-cascader>
       </el-form-item>
       <el-form-item label="生日">
-        <el-date-picker v-model="userProfileForm.birthday" type="date" placeholder="选择出生日期"></el-date-picker>
+        <el-date-picker v-model="userProfileForm.birthday" type="date" placeholder="选择出生日期"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="saveProfile">保存信息</el-button>
@@ -53,11 +49,11 @@
           {{ getCode }}
         </el-button>
       </el-form-item>
-      <el-form-item label="验证码">
-        <el-input type="text" v-model="userEmailForm.checkCode" prop="checkCode"></el-input>
+      <el-form-item label="验证码" prop="checkCode">
+        <el-input type="text" v-model="userEmailForm.checkCode"/>
       </el-form-item>
-      <el-form-item label="新邮箱">
-        <el-input type="text" v-model="userEmailForm.newEmail" prop="newEmail"></el-input>
+      <el-form-item label="新邮箱" prop="newEmail">
+        <el-input type="text" v-model="userEmailForm.newEmail"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="confirmModifyEmail">确认修改</el-button>
@@ -97,13 +93,15 @@ import {sendCheckCode} from "@/api/login";
 export default {
   name: "UserInfo",
   data() {
-
     const validateTelephone = (rule, value, callback) => {
-      console.log(value);
+      // 不为空必须满足正则表达式
       if (value) {
         if (!(/^[1][3,4,5,7,8][0-9]{9}$/.test(value))) {
           callback(new Error("电话号码格式错误"));
         }
+        callback();
+      } else {
+        // 如果为空 可以保存
         callback();
       }
     };
@@ -128,7 +126,7 @@ export default {
     };
     const validateEmail = (rule, value, callback) => {
       if (value) {
-        if (!(/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
+        if (!(/^[A-Za-z0-9_\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value))) {
           callback(new Error("邮箱格式错误"));
         }
         callback();
@@ -136,6 +134,7 @@ export default {
     };
     return {
       userId: JSON.parse(sessionStorage.userInfo).id,
+      username:JSON.parse(sessionStorage.userInfo).username,
       getCode: '获取验证码',
       count: 60,
       isGeting: false,
@@ -150,7 +149,7 @@ export default {
           label: '女'
         }],
         gender: null,
-        telephone: '',
+        telephone: null,
         birthday: null,
         addressOptions: regionData,
         addressSelectedOptions: null,
@@ -169,8 +168,8 @@ export default {
       },
       rulesProfile: {
         telephone: [
+          {required: false, trigger: 'blur', message: '必填选项'},
           {validator: validateTelephone, trigger: 'blur', message: '手机号格式不正确'},
-          {required: true, trigger: 'blur', message: '必填选项'}
         ],
       },
       rulesEmail: {
@@ -178,7 +177,10 @@ export default {
           {required: true, trigger: 'blur', message: '请输入验证码'},
           {length: 6, trigger: 'blur', message: '验证码长度为 6 个字符'}
         ],
-        newEmail: [{validator: validateEmail, trigger: 'blur'}]
+        newEmail: [
+          {required: true, trigger: 'blur', message: '请输入换绑的邮箱'},
+          {validator: validateEmail, trigger: 'blur'}
+        ]
       },
       rulesPassword: {
         newPassword: [
@@ -224,6 +226,8 @@ export default {
               if (response === SystemStatusCode.SUCCESS) {
                 this.$message.success("修改成功");
                 this.getProfile();
+              } else if (response === SystemStatusCode.CHECKCODE_INVALID) {
+                this.$message.error("验证码错误");
               } else {
                 this.$message.error("修改失败");
               }
@@ -244,7 +248,6 @@ export default {
             this.userProfileForm.addressSelectedOptions.toString(),
             this.userProfileForm.birthday,
           ).then(response => {
-            console.log(response);
             if (response === SystemStatusCode.SUCCESS) {
               sessionStorage.setItem("gender", this.userProfileForm.gender);
               sessionStorage.setItem("nickName", this.userProfileForm.nickName);

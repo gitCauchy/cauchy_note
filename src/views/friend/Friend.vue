@@ -29,8 +29,8 @@
                 <el-button type="primary" icon="el-icon-share"
                            @click="handleShare(scope.$index,scope.row)"></el-button>
               </el-tooltip>
-              <el-tooltip effect="dark" content="分享" placement="top">
-                <el-button type="primary" icon="el-icon-message" style="background-color: #b2d235"
+              <el-tooltip effect="dark" content="站内消息" placement="top">
+                <el-button type="primary" icon="el-icon-message"
                            @click="sendMessage(scope.$index,scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip effect="dark" content="设置备注" placement="top">
@@ -379,15 +379,15 @@ export default {
         this.messageForm.messageContent,
         0,
       )
-      .then(response=>{
-        if(response === SystemStatusCode.SUCCESS){
-          this.$message.success("发送成功！");
-          this.messageDialogVisible = false;
-        }else{
-          this.$message.error("发送失败！");
-          this.messageDialogVisible = false;
-        }
-      })
+        .then(response => {
+          if (response === SystemStatusCode.SUCCESS) {
+            this.$message.success("发送成功！");
+            this.messageDialogVisible = false;
+          } else {
+            this.$message.error("发送失败！");
+            this.messageDialogVisible = false;
+          }
+        })
     }
   }
 }
