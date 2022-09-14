@@ -20,6 +20,9 @@
         </el-form>
       </el-row>
     </div>
+    <div style="text-align: center; margin-top: 300px">
+      <a href="https://beian.miit.gov.cn/" target="_blank" style="color: #409EFF">津ICP备2022001690号-1</a>
+    </div>
   </div>
 </template>
 
